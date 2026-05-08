@@ -33,7 +33,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
+    <div className="flex h-full w-full overflow-hidden bg-white">
       {/* Sidebar sx: filtri */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-slate-200 p-5 gap-6 shrink-0 bg-slate-50/50">
         <div>
