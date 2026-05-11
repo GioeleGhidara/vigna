@@ -1,28 +1,27 @@
 import { useState } from 'react';
 import { 
-  IconHome, IconDroplet, IconGauge, IconAerialLift, IconBuildingWarehouse, 
-  IconX, IconMapPin, IconTrash, IconApple, IconCherry, IconLemon, IconBanana, IconPlant, IconLeaf, IconFlower
-} from '@tabler/icons-react';
+  Home, Droplets, Gauge, Zap, Building2, 
+  X, MapPin, Trash2, Apple, Cherry, Citrus, Trees, Leaf, Flower2
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { POI } from '@/types';
 
 const ICON_OPTIONS = [
-  // Infrastruttura (Tabler)
-  { id: 'Home', icon: IconHome, label: 'Edificio', isEmoji: false },
-  { id: 'Warehouse', icon: IconBuildingWarehouse, label: 'Magazzino', isEmoji: false },
-  { id: 'Droplets', icon: IconDroplet, label: 'Rubinetto', isEmoji: false },
-  { id: 'Gauge', icon: IconGauge, label: 'Contatore', isEmoji: false },
-  { id: 'UtilityPole', icon: IconAerialLift, label: 'Palo/Centralina', isEmoji: false },
+  // Infrastruttura
+  { id: 'Home', icon: Home, label: 'Edificio', color: '#1e293b' },
+  { id: 'Warehouse', icon: Building2, label: 'Magazzino', color: '#064e3b' },
+  { id: 'Droplets', icon: Droplets, label: 'Rubinetto', color: '#2563eb' },
+  { id: 'Gauge', icon: Gauge, label: 'Contatore', color: '#3b82f6' },
+  { id: 'UtilityPole', icon: Zap, label: 'Palo/Centralina', color: '#d97706' },
   
-  // Frutta (Tabler - Dove disponibili)
-  { id: 'Melo', icon: IconApple, label: 'Melo', isEmoji: false, color: '#ef4444' },
-  { id: 'Pero', icon: IconApple, label: 'Pero', isEmoji: false, color: '#a3e635' },
-  { id: 'Limone', icon: IconLemon, label: 'Limone', isEmoji: false, color: '#facc15' },
-  { id: 'Ciliegio', icon: IconCherry, label: 'Ciliegio', isEmoji: false, color: '#b91c1c' },
-  { id: 'Banana', icon: IconBanana, label: 'Banana', isEmoji: false, color: '#fde047' },
-  { id: 'Vite', icon: IconLeaf, label: 'Vite', isEmoji: false, color: '#65a30d' },
-  { id: 'Pesco', icon: IconFlower, label: 'Pesco', isEmoji: false, color: '#fda4af' },
-  { id: 'Albero', icon: IconPlant, label: 'Albero Gen.', isEmoji: false, color: '#166534' },
+  // Frutta & Natura
+  { id: 'Melo', icon: Apple, label: 'Melo', color: '#ef4444' },
+  { id: 'Pero', icon: Apple, label: 'Pero', color: '#a3e635' },
+  { id: 'Limone', icon: Citrus, label: 'Limone', color: '#facc15' },
+  { id: 'Ciliegio', icon: Cherry, label: 'Ciliegio', color: '#b91c1c' },
+  { id: 'Vite', icon: Leaf, label: 'Vite', color: '#65a30d' },
+  { id: 'Pesco', icon: Flower2, label: 'Pesco', color: '#fda4af' },
+  { id: 'Albero', icon: Trees, label: 'Albero Gen.', color: '#166534' },
 ];
 
 interface Props {
@@ -56,11 +55,7 @@ export default function POICard({ poi, onUpdate, onDelete, onClose, isReposition
       <header className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center shadow-sm text-3xl">
-            {selectedIcon.isEmoji ? (
-              <span>{selectedIcon.icon as string}</span>
-            ) : (
-              <selectedIcon.icon size={32} className="text-slate-900" />
-            )}
+            <selectedIcon.icon size={32} style={{ color: selectedIcon.color || '#000' }} />
           </div>
           <div>
             <h2 className="text-2xl font-heading font-black text-slate-900 tracking-tight">{poi.nome}</h2>
@@ -68,7 +63,7 @@ export default function POICard({ poi, onUpdate, onDelete, onClose, isReposition
           </div>
         </div>
         <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-          <X size={20} />
+          <X size={24} />
         </button>
       </header>
 
@@ -97,6 +92,7 @@ export default function POICard({ poi, onUpdate, onDelete, onClose, isReposition
               {(['edificio', 'infrastruttura', 'albero'] as const).map(t => (
                 <button
                   key={t}
+                  type="button"
                   onClick={() => setEditForm({...editForm, tipo: t})}
                   className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${editForm.tipo === t ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-400'}`}
                 >
@@ -112,6 +108,7 @@ export default function POICard({ poi, onUpdate, onDelete, onClose, isReposition
               {ICON_OPTIONS.map(opt => (
                 <button
                   key={opt.id}
+                  type="button"
                   onClick={() => setEditForm({...editForm, icona: opt.id})}
                   className={`p-3 rounded-xl flex items-center justify-center transition-all ${editForm.icona === opt.id ? 'bg-emerald-100 text-emerald-900 ring-2 ring-emerald-600' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
                   title={opt.label}

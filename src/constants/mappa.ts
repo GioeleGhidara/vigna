@@ -1,4 +1,4 @@
-// Solo costanti visive per rendering SVG — filari e tipi vengono dal DB
+// Solo costanti visive per rendering SVG - filari e tipi vengono dal DB
 export const MAP_CONFIG = {
   MARGIN_LEFT: 200,
   MARGIN_TOP: 150,

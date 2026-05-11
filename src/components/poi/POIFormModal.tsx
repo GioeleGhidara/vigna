@@ -1,28 +1,28 @@
 import { useState } from 'react';
 import { 
-  IconHome, IconDroplet, IconGauge, IconAerialLift, IconBuildingWarehouse, 
-  IconX, IconApple, IconCherry, IconLemon, IconBanana, IconPlant, IconLeaf, IconFlower
-} from '@tabler/icons-react';
+  Home, Building2, Droplets, Gauge, Zap, 
+  Apple, Cherry, Citrus, Trees, Leaf, Flower2,
+  X
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { POIInput } from '@/types';
 
 const ICON_OPTIONS = [
-  // Infrastruttura (Tabler)
-  { id: 'Home', icon: IconHome, label: 'Edificio', isEmoji: false },
-  { id: 'Warehouse', icon: IconBuildingWarehouse, label: 'Magazzino', isEmoji: false },
-  { id: 'Droplets', icon: IconDroplet, label: 'Rubinetto', isEmoji: false },
-  { id: 'Gauge', icon: IconGauge, label: 'Contatore', isEmoji: false },
-  { id: 'UtilityPole', icon: IconAerialLift, label: 'Palo/Centralina', isEmoji: false },
+  // Infrastruttura
+  { id: 'Home', icon: Home, label: 'Edificio' },
+  { id: 'Warehouse', icon: Building2, label: 'Magazzino' },
+  { id: 'Droplets', icon: Droplets, label: 'Rubinetto' },
+  { id: 'Gauge', icon: Gauge, label: 'Contatore' },
+  { id: 'UtilityPole', icon: Zap, label: 'Palo/Centralina' },
   
-  // Frutta (Tabler)
-  { id: 'Melo', icon: IconApple, label: 'Melo', isEmoji: false },
-  { id: 'Pero', icon: IconApple, label: 'Pero', isEmoji: false },
-  { id: 'Limone', icon: IconLemon, label: 'Limone', isEmoji: false },
-  { id: 'Ciliegio', icon: IconCherry, label: 'Ciliegio', isEmoji: false },
-  { id: 'Banana', icon: IconBanana, label: 'Banana', isEmoji: false },
-  { id: 'Vite', icon: IconLeaf, label: 'Vite', isEmoji: false },
-  { id: 'Pesco', icon: IconFlower, label: 'Pesco', isEmoji: false },
-  { id: 'Albero', icon: IconPlant, label: 'Albero Gen.', isEmoji: false },
+  // Frutta & Natura
+  { id: 'Melo', icon: Apple, label: 'Melo' },
+  { id: 'Pero', icon: Apple, label: 'Pero' },
+  { id: 'Limone', icon: Citrus, label: 'Limone' },
+  { id: 'Ciliegio', icon: Cherry, label: 'Ciliegio' },
+  { id: 'Vite', icon: Leaf, label: 'Vite' },
+  { id: 'Pesco', icon: Flower2, label: 'Pesco' },
+  { id: 'Albero', icon: Trees, label: 'Albero Gen.' },
 ];
 
 interface Props {
@@ -60,7 +60,9 @@ export default function POIFormModal({ onClose, onSubmit }: Props) {
       <div className="bg-[#fcfaf7] rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden noise-bg border border-white">
         <header className="px-10 py-8 border-b border-slate-100 flex justify-between items-center">
           <h2 className="text-2xl font-heading font-black text-slate-900 italic">Nuovo Landmark</h2>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600">✕</button>
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600">
+            <X size={24} />
+          </button>
         </header>
 
         <form onSubmit={handleSubmit} className="p-10 space-y-6">
