@@ -10,9 +10,11 @@ import { TipoBar } from '@/components/dashboard/TipoBar';
 import TipiManager from '@/components/dashboard/TipiManager';
 import FilariManager from '@/components/dashboard/FilariManager';
 import POIManager from '@/components/dashboard/POIManager';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'stats' | 'manage'>('stats');
+  // Inizializziamo a 'filari' aperto di default
   const [openAccordion, setOpenAccordion] = useState<string | null>('filari');
   
   const { piante, isLoading: isLoadingPiante } = usePiante();
@@ -21,6 +23,7 @@ export default function DashboardPage() {
   const { poi } = usePOI();
   const { operazioni } = useOperazioni();
 
+  // Aggregazione ottimizzata tramite useMemo (dalla documentazione tecnica)
   const statoPiante = useMemo(() => {
     return piante.reduce(
       (acc: Record<string, number>, p) => { 
@@ -47,6 +50,7 @@ export default function DashboardPage() {
 
   const tipiConPiante = tipi.filter(t => countByTipo[t.id]);
 
+  // Sotto-componente Accordion blindato con ErrorBoundary per prevenire crash totali
   const AccordionSection = ({ id, title, count, children }: { id: string, title: string, count: number, children: React.ReactNode }) => {
     const isOpen = openAccordion === id;
     return (
@@ -63,7 +67,9 @@ export default function DashboardPage() {
         </button>
         {isOpen && (
           <div className="px-8 pb-10 pt-4 animate-in fade-in slide-in-from-top-4 duration-500 border-t border-slate-50">
-            {children}
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
           </div>
         )}
       </div>
@@ -120,21 +126,34 @@ export default function DashboardPage() {
                   <div className="h-px flex-1 mx-4 lg:mx-8 bg-slate-100 hidden md:block" />
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Distribuzione</span>
                 </div>
-                <div className="space-y-8 lg:space-y-10">
-                  {tipiConPiante.map(t => (
-                    <TipoBar key={t.id} tipo={t} count={countByTipo[t.id]} totale={piante.length} />
-                  ))}
-                </div>
+                {piante.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400 font-medium text-sm">
+                    Nessuna vite mappata. Passa alla scheda "Modellazione" per iniziare.
+                  </div>
+                ) : (
+                  <div className="space-y-8 lg:space-y-10">
+                    {tipiConPiante.map(t => (
+                      <TipoBar key={t.id} tipo={t} count={countByTipo[t.id]} totale={piante.length} />
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="premium-card p-8 lg:p-10 bg-slate-900 text-white flex flex-col justify-between min-h-[300px]">
                 <div className="space-y-4">
                   <h3 className="text-lg lg:text-xl font-serif italic text-emerald-400">Suggerimento</h3>
                   <p className="text-slate-400 text-xs lg:text-sm leading-relaxed font-medium">
-                    Sulla base dei dati attuali, il {Math.round((statoPiante.morta / (piante.length || 1)) * 100)}% del vigneto richiede attenzione immediata.
+                    {piante.length === 0 ? (
+                      "Il tuo gemello digitale è pronto. Popola i filari per ricevere analisi predittive e suggerimenti di intervento."
+                    ) : (
+                      `Sulla base dei dati attuali, il ${Math.round((statoPiante.morta / piante.length) * 100)}% del vigneto richiede attenzione immediata.`
+                    )}
                   </p>
                 </div>
-                <button className="w-full mt-8 py-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+                <button 
+                  disabled={piante.length === 0}
+                  className="w-full mt-8 py-4 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
+                >
                   Esporta PDF
                 </button>
               </div>
