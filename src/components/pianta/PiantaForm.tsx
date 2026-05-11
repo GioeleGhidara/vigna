@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useFilari } from '@/hooks/useFilari';
 import { useTipiPianta } from '@/hooks/useTipiPianta';
 import { MapPin, List, ChevronRight } from 'lucide-react';
-import type { Pianta, PiantaInput } from '@/types';
+import type { Pianta } from '@/types';
 
 interface Props {
   initialData?: Partial<Pianta>;
@@ -17,7 +17,7 @@ export function PiantaForm({ initialData, onSubmit, onClose, title }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    id: initialData?.id ?? '',
+    codice_etichetta: initialData?.codice_etichetta ?? '',
     filare_id: initialData?.filare_id ?? (filari[0]?.id || 0),
     tipo_id: initialData?.tipo_id ?? (tipi[0]?.id || 0),
     stato: initialData?.stato ?? 'attiva',
@@ -69,17 +69,16 @@ export function PiantaForm({ initialData, onSubmit, onClose, title }: Props) {
         <form onSubmit={handleSubmit} className="p-10 space-y-8 overflow-y-auto max-h-[70vh]">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* ID & Filare */}
+            {/* Codice & Filare */}
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Codice Identificativo</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Codice Etichetta (Campo)</label>
                 <input 
                   type="text" 
-                  value={form.id}
-                  disabled={!!initialData?.id}
-                  onChange={e => setForm({...form, id: e.target.value})}
-                  className="w-full bg-white border border-slate-100 p-4 text-sm font-mono font-bold rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-emerald-800 disabled:opacity-50 uppercase"
-                  placeholder="es. VIG-001"
+                  value={form.codice_etichetta}
+                  onChange={e => setForm({...form, codice_etichetta: e.target.value})}
+                  className="w-full bg-white border border-slate-100 p-4 text-sm font-mono font-bold rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-emerald-800 uppercase"
+                  placeholder="es. F1-001"
                   required
                 />
               </div>

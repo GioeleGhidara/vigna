@@ -2,7 +2,7 @@ import { useTipiPianta } from '@/hooks/useTipiPianta';
 import { useState } from 'react';
 import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
 
-export function TipiManager() {
+export default function TipiManager() {
   const { tipi, createTipo, updateTipo, deleteTipo } = useTipiPianta();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newTipo, setNewTipo] = useState({ nome: '', colore_hex: '#10b981' });

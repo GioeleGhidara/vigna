@@ -21,7 +21,7 @@ export default function PiantaEditModal({ pianta, onClose }: Props) {
       initialData={pianta} 
       onSubmit={handleSubmit} 
       onClose={onClose} 
-      title={`Modifica Vite ${pianta.id}`}
+      title={`Modifica Vite ${pianta.codice_etichetta}`}
     />
   );
 }

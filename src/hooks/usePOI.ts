@@ -56,5 +56,17 @@ export const usePOI = () => {
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
-  return { poi, isLoading, createPOI, updatePOI, deletePOI };
+  const { mutateAsync: clearAllPOI } = useMutation({
+    mutationFn: () => supabase.from('punti_interesse').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError(),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: [QUERY_KEY] });
+      const previous = qc.getQueryData<POI[]>([QUERY_KEY]);
+      qc.setQueryData<POI[]>([QUERY_KEY], []);
+      return { previous };
+    },
+    onError: (err, variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
+  });
+
+  return { poi, isLoading, createPOI, updatePOI, deletePOI, clearAllPOI };
 };

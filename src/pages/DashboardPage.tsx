@@ -2,22 +2,24 @@ import { usePiante } from '@/hooks/usePiante';
 import { useFilari } from '@/hooks/useFilari';
 import { useTipiPianta } from '@/hooks/useTipiPianta';
 import { useOperazioni } from '@/hooks/useOperazioni';
+import { usePOI } from '@/hooks/usePOI';
 import { useState, useMemo } from 'react';
-import { BarChart3, Settings2 } from 'lucide-react';
+import { BarChart3, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { TipoBar } from '@/components/dashboard/TipoBar';
 import TipiManager from '@/components/dashboard/TipiManager';
 import FilariManager from '@/components/dashboard/FilariManager';
-import PianteManager from '@/components/dashboard/PianteManager';
+import POIManager from '@/components/dashboard/POIManager';
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'stats' | 'management'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'manage'>('stats');
+  const [openAccordion, setOpenAccordion] = useState<string | null>('filari');
+  
   const { piante, isLoading: isLoadingPiante } = usePiante();
   const { filari } = useFilari();
   const { tipi } = useTipiPianta();
+  const { poi } = usePOI();
   const { operazioni } = useOperazioni();
-
-  const isLoading = isLoadingPiante;
 
   const statoPiante = useMemo(() => {
     return piante.reduce(
@@ -36,9 +38,7 @@ export default function DashboardPage() {
     }, {});
   }, [piante]);
 
-  const totaleOperazioni = operazioni.length;
-
-  if (isLoading)
+  if (isLoadingPiante)
     return (
       <div className="flex h-full items-center justify-center bg-[#fcfaf7]">
         <div className="w-16 h-16 border-2 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
@@ -46,6 +46,29 @@ export default function DashboardPage() {
     );
 
   const tipiConPiante = tipi.filter(t => countByTipo[t.id]);
+
+  const AccordionSection = ({ id, title, count, children }: { id: string, title: string, count: number, children: React.ReactNode }) => {
+    const isOpen = openAccordion === id;
+    return (
+      <div className="premium-card bg-white border border-slate-100 overflow-hidden transition-all duration-500 shadow-sm hover:shadow-md">
+        <button 
+          onClick={() => setOpenAccordion(isOpen ? null : id)}
+          className="w-full px-8 py-6 flex items-center justify-between hover:bg-slate-50/50 transition-colors"
+        >
+          <div className="flex items-center gap-4">
+            <h3 className="text-xl font-heading font-black text-slate-900 uppercase tracking-tight italic">{title}</h3>
+            <span className="px-3 py-1 bg-slate-100 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest">{count} {count === 1 ? 'Elemento' : 'Elementi'}</span>
+          </div>
+          {isOpen ? <ChevronUp className="text-slate-300" /> : <ChevronDown className="text-slate-300" />}
+        </button>
+        {isOpen && (
+          <div className="px-8 pb-10 pt-4 animate-in fade-in slide-in-from-top-4 duration-500 border-t border-slate-50">
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="h-full w-full overflow-y-auto bg-[#fcfaf7] pb-24">
@@ -87,7 +110,7 @@ export default function DashboardPage() {
               <StatCard label="Piante Attive" value={statoPiante.attiva} color="emerald" icon="Leaf" />
               <StatCard label="Piante Morte" value={statoPiante.morta} color="red" icon="Wind" />
               <StatCard label="Rimpiazzi" value={statoPiante.ripiantata} color="amber" icon="RotateCcw" />
-              <StatCard label="Operazioni" value={totaleOperazioni} color="blue" icon="Trello" />
+              <StatCard label="Operazioni" value={operazioni.length} color="blue" icon="Trello" />
             </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
@@ -118,14 +141,18 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-16">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <AccordionSection id="filari" title="Struttura Filari" count={filari.length}>
               <FilariManager />
+            </AccordionSection>
+            
+            <AccordionSection id="tipi" title="Varietà d'Uva" count={tipi.length}>
               <TipiManager />
-            </div>
-            <div className="pt-12 border-t border-slate-100">
-              <PianteManager />
-            </div>
+            </AccordionSection>
+            
+            <AccordionSection id="poi" title="Punti di Interesse" count={poi.length}>
+              <POIManager />
+            </AccordionSection>
           </div>
         )}
       </div>

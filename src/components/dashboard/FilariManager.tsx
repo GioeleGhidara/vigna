@@ -10,7 +10,7 @@ const PRODUTTORI_LIST = [
   "Vivaio Revella (Quiliano)"
 ];
 
-export function FilariManager() {
+export default function FilariManager() {
   const { filari, createFilare, updateFilare, deleteFilare } = useFilari();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newFilare, setNewFilare] = useState({ nome: '', ordine: 0, venditore: '' });

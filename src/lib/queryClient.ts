@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { get, set, del } from 'idb-keyval';
 
 export const queryClient = new QueryClient({
@@ -14,22 +14,18 @@ export const queryClient = new QueryClient({
   },
 });
 
-// Persister personalizzato usando idb-keyval per IndexedDB
-const idbPersister = {
-  persistClient: async (client: any) => {
-    await set('vigna-query-cache', client);
+// Persister Asincrono dedicato per IndexedDB (idb-keyval)
+const asyncPersister = createAsyncStoragePersister({
+  storage: {
+    getItem: (key) => get(key),
+    setItem: (key, value) => set(key, value),
+    removeItem: (key) => del(key),
   },
-  restoreClient: async () => {
-    return await get('vigna-query-cache');
-  },
-  removeClient: async () => {
-    await del('vigna-query-cache');
-  },
-};
+  key: 'vigna-query-cache',
+});
 
 persistQueryClient({
   queryClient,
-  persister: idbPersister as any,
+  persister: asyncPersister,
   maxAge: 1000 * 60 * 60 * 24, // 24 ore
 });
-

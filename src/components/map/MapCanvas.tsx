@@ -1,36 +1,105 @@
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import React from 'react';
+import { TransformWrapper, TransformComponent, useTransformContext } from 'react-zoom-pan-pinch';
 import { calcCoords, calcCanvasSize } from '@/lib/mapUtils';
 import PiantaCircle from './PiantaCircle';
-import { 
-  IconHome, IconDroplet, IconGauge, IconAerialLift, IconBuildingWarehouse, 
-  IconApple, IconCherry, IconLemon, IconBanana, IconPlant, IconLeaf, IconFlower
-} from '@tabler/icons-react';
+import {
+  Home, Building2, Droplets, Gauge, Trees, Apple, Cherry, Zap, Sprout, Citrus, Flower
+} from 'lucide-react';
 import type { Pianta, Filare, TipoPianta, POI } from '@/types';
+import { MAP_CONFIG } from '@/constants/mappa';
 
-const ICON_MAP: Record<string, { icon: any, isEmoji: boolean }> = {
-  // Infrastruttura (Tabler)
-  Home: { icon: IconHome, isEmoji: false },
-  Warehouse: { icon: IconBuildingWarehouse, isEmoji: false },
-  Droplets: { icon: IconDroplet, isEmoji: false },
-  Gauge: { icon: IconGauge, isEmoji: false },
-  UtilityPole: { icon: IconAerialLift, isEmoji: false },
-  Droplet: { icon: IconDroplet, isEmoji: false },
-  Sprout: { icon: IconPlant, isEmoji: false },
-
-  // Frutta (Tabler)
-  Melo: { icon: IconApple, isEmoji: false },
-  Pero: { icon: IconApple, isEmoji: false },
-  Limone: { icon: IconLemon, isEmoji: false },
-  Ciliegio: { icon: IconCherry, isEmoji: false },
-  Banana: { icon: IconBanana, isEmoji: false },
-  Vite: { icon: IconLeaf, isEmoji: false },
-  Pesco: { icon: IconFlower, isEmoji: false },
-  Albero: { icon: IconPlant, isEmoji: false },
+// Mappatura coerente al 100% con POIManager.tsx usando esclusivamente lucide-react
+const ICON_MAP: Record<string, { icon: any, color: string }> = {
+  Home: { icon: Home, color: '#0f172a' },
+  Warehouse: { icon: Building2, color: '#064e3b' },
+  Droplets: { icon: Droplets, color: '#2563eb' },
+  Gauge: { icon: Gauge, color: '#3b82f6' },
+  UtilityPole: { icon: Zap, color: '#ca8a04' },
+  Droplet: { icon: Droplets, color: '#2563eb' },
+  Sprout: { icon: Sprout, color: '#10b981' },
+  Albero: { icon: Trees, color: '#059669' },
+  Melo: { icon: Apple, color: '#ef4444' },
+  Pero: { icon: Apple, color: '#f59e0b' },
+  Limone: { icon: Citrus, color: '#eab308' },
+  Ciliegio: { icon: Cherry, color: '#dc2626' },
+  Banana: { icon: Trees, color: '#f59e0b' },
+  Vite: { icon: Sprout, color: '#10b981' },
+  Pesco: { icon: Flower, color: '#db2777' },
 };
 
-const ROW_HEIGHT = 120;
-const ROW_OFFSET_Y = 200; 
-const LABEL_X = 150;
+// Sotto-componente isolato: ascolta lo zoom SOLO per i POI/Alberi (~30 elementi totali)
+function DynamicPOILayers({
+  poi, selectedId, onSelect
+}: {
+  poi: POI[]; selectedId?: string; onSelect: (id: string) => void;
+}) {
+  const { state } = useTransformContext();
+  const scale = state.scale;
+
+  const isBirdseyeView = scale < 0.2;
+  const isDetailView = scale > 0.7;
+
+  return (
+    <g id="poi-layers">
+      {poi.map(item => {
+        const config = ICON_MAP[item.icona] || { icon: Trees, color: '#059669' };
+        const isEdificio = item.tipo === 'edificio';
+        const isAlbero = item.tipo === 'albero';
+
+        const baseSize = isEdificio ? 40 : (isAlbero ? 30 : 24);
+        const currentSize = Math.min(80, baseSize / scale);
+
+        return (
+          <g
+            key={item.id}
+            transform={`translate(${item.coord_x}, ${item.coord_y})`}
+            className="opacity-90 hover:opacity-100 transition-opacity cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(item.id);
+            }}
+          >
+            {isBirdseyeView ? (
+              <circle r={8 / scale} fill={config.color} />
+            ) : (
+              <>
+                {isEdificio && (
+                  <rect
+                    x={-currentSize * 0.25}
+                    y={-currentSize * 0.25}
+                    width={currentSize * 1.5}
+                    height={currentSize * 1.5}
+                    rx={8 / scale}
+                    fill="#fcfaf7"
+                    stroke="#e2e8f0"
+                    strokeWidth={1 / scale}
+                    className="shadow-md"
+                  />
+                )}
+
+                <g transform={`translate(${-currentSize / 2}, ${-currentSize / 2})`}>
+                  <config.icon size={currentSize} color={config.color} strokeWidth={2} />
+                </g>
+
+                {isDetailView && (
+                  <text
+                    x={isEdificio ? currentSize * 1.2 : 0}
+                    y={isEdificio ? currentSize * 0.5 : currentSize * 0.7 + 10}
+                    textAnchor={isEdificio ? 'start' : 'middle'}
+                    style={{ fontSize: `${Math.min(20, 11 / scale)}px` }}
+                    className="font-bold fill-slate-800 pointer-events-none select-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] uppercase tracking-tighter"
+                  >
+                    {item.nome}
+                  </text>
+                )}
+              </>
+            )}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
 
 interface Props {
   filari: Filare[];
@@ -45,44 +114,75 @@ interface Props {
 }
 
 export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, onSelect, repositioningId, onReposition, colorMode = 'variety' }: Props) {
-  const { width: vWidth, height: vHeight } = calcCanvasSize(filari);
-  
-  const width = vWidth + 600;
-  const height = vHeight + 600;
-
+  const { width: vWidth, height: vHeight } = calcCanvasSize(filari, poi);
+  const width = vWidth + 200;
+  const height = vHeight + 200;
   const filariMap = Object.fromEntries(filari.map(f => [f.id, f]));
-  
+
   const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!repositioningId || !onReposition) return;
     const svg = e.currentTarget;
     const pt = svg.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    
     const ctm = svg.getScreenCTM();
     if (!ctm) return;
-    
     const cursorPt = pt.matrixTransform(ctm.inverse());
     onReposition(repositioningId, Math.round(cursorPt.x), Math.round(cursorPt.y));
   };
 
   return (
-    <div className={`w-full h-full overflow-hidden border-0 rounded-[2.5rem] shadow-2xl transition-all duration-1000 noise-bg ${repositioningId ? 'bg-emerald-950/60 cursor-crosshair' : 'bg-[#042f2e] cursor-grab active:cursor-grabbing'}`}>
-      <TransformWrapper 
-        minScale={0.05} 
-        maxScale={4} 
-        initialScale={0.25} 
+    <div className={`w-full h-full overflow-hidden border border-slate-100 rounded-[2.5rem] shadow-2xl transition-all duration-1000 noise-bg ${repositioningId ? 'bg-emerald-50/80 cursor-crosshair' : 'bg-[#fcfaf7] cursor-grab active:cursor-grabbing'}`}>
+      <TransformWrapper
+        minScale={0.1}
+        maxScale={10}
+        initialScale={0.5} // Calibrato per aprire la mappa comodamente centrata
         centerOnInit
         panning={{ disabled: !!repositioningId }}
         doubleClick={{ disabled: true }}
+        // L'aggiornamento del LOD avviene a costo zero sul DOM nativo, bypassando il ciclo di React
+        onTransformed={(ref) => {
+          const scale = ref.state.scale;
+          const container = document.getElementById('map-container');
+          if (!container) return;
+          if (scale < 0.2) {
+            container.setAttribute('data-lod', 'birdseye');
+          } else if (scale > 0.7) {
+            container.setAttribute('data-lod', 'detail');
+          } else {
+            container.setAttribute('data-lod', 'medium');
+          }
+        }}
       >
         <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
-          <svg 
+          {/* Aggiunti width e height espliciti in pixel, rimossi w-full e h-full */}
+          <svg
+            id="map-container"
+            data-lod="medium"
+            width={width}
+            height={height}
             viewBox={`0 0 ${width} ${height}`}
-            className="w-full h-full bg-transparent" 
-            onClick={handleSvgClick} 
+            className="bg-transparent max-w-none select-none"
+            onClick={handleSvgClick}
             style={{ shapeRendering: 'geometricPrecision' }}
           >
+            {/* STILE INTEGRATO PER IL LOD PASSIVO */}
+            <style>{`
+              /* Transizione morbida per le etichette delle viti */
+              .vite-label {
+                opacity: 0;
+                transition: opacity 0.2s ease;
+              }
+              /* In modalità dettaglio (zoom ravvicinato), mostra le etichette */
+              [data-lod="detail"] .vite-label {
+                opacity: 1;
+              }
+              /* In modalità birdseye (zoom aereo estremo), nascondi completamente il blocco viti per massimizzare gli FPS */
+              [data-lod="birdseye"] #vigneto-viti {
+                display: none;
+              }
+            `}</style>
+
             <defs>
               <linearGradient id="rowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#fbbf24" stopOpacity="0" />
@@ -90,124 +190,67 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
                 <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
               </linearGradient>
             </defs>
-            
-            {/* --- LIVELLO 1: Aree Naturali --- */}
+
             <g id="aree-naturali">
-              <polygon points={`0,0 ${width},0 ${width},150 0,300`} fill="#064e3b" opacity="0.15" />
-              <rect x={width - 400} y={height - 400} width="400" height="400" fill="#eab308" opacity="0.05" />
+              <path d={`M 0,0 L ${width},0 L ${width},80 Q ${width * 0.75},180 ${width * 0.5},120 T 0,200 Z`} fill="#047857" opacity="0.06" />
+              <path d={`M 0,${height - 80} Q ${width * 0.3},${height - 180} ${width * 0.7},${height - 120} T ${width},${height - 150} L ${width},${height} L 0,${height} Z`} fill="#0369a1" opacity="0.05" />
             </g>
 
-            {/* --- LIVELLO 2: Confini e Fiume --- */}
-            <g id="confini">
-              <path 
-                d={`M 0,${height - 100} Q ${width/2},${height - 300} ${width},${height - 150}`} 
-                fill="none" 
-                stroke="#3b82f6" 
-                strokeWidth="40" 
-                opacity="0.15" 
-                strokeLinecap="round"
-              />
-              <polyline 
-                points={`50,100 50,${height-50} ${width-50},${height-50}`} 
-                fill="none" 
-                stroke="#1e293b" 
-                strokeWidth="2" 
-                strokeDasharray="10,15" 
-                opacity="0.3"
-              />
-            </g>
-
-            {/* --- LIVELLO 3: Il Vigneto --- */}
-            <g id="vigneto">
-              <text x="150" y="100" className="font-heading font-black text-8xl text-slate-100 uppercase tracking-tighter opacity-10 pointer-events-none">
+            {/* STRUTTURA: Filari Lineari Geometrici */}
+            <g id="vigneto-struttura">
+              <text x={MAP_CONFIG.MARGIN_LEFT - 50} y={MAP_CONFIG.MARGIN_TOP - 60} className="font-heading font-black text-8xl text-slate-900 uppercase tracking-tighter opacity-[0.03] pointer-events-none select-none">
                 Fojachini
               </text>
-
               {filari.map(f => {
                 const isSelected = filariMap[selectedId || '']?.id === f.id;
-                const y = ROW_OFFSET_Y + f.ordine * ROW_HEIGHT;
-                
+                const y = MAP_CONFIG.MARGIN_TOP + f.ordine * MAP_CONFIG.SPACING_Y;
+                const endX = MAP_CONFIG.MARGIN_LEFT + (f.numero_piante || 20) * MAP_CONFIG.SPACING_X;
+
                 return (
                   <g key={f.id}>
                     {isSelected && (
-                      <rect x={0} y={y - 55} width={width} height={110} fill="url(#rowGradient)" />
+                      <rect x={MAP_CONFIG.MARGIN_LEFT - 40} y={y - 40} width={endX - MAP_CONFIG.MARGIN_LEFT + 80} height={80} fill="url(#rowGradient)" rx={16} />
                     )}
-                    <line 
-                      x1={LABEL_X + 100} y1={y} x2={width - 200} y2={y} 
-                      stroke={isSelected ? '#fbbf24' : '#064e3b'} 
-                      strokeWidth={isSelected ? 1.5 : 0.5}
-                      strokeDasharray={isSelected ? "0" : "5,15"}
-                    />
-                    <text
-                      x={LABEL_X} y={y} fontSize={28}
-                      fontFamily="Montserrat, sans-serif" fontWeight={isSelected ? "900" : "700"}
-                      fill={isSelected ? "#fbbf24" : "#115e59"} dominantBaseline="middle"
-                    >
+                    <line x1={MAP_CONFIG.MARGIN_LEFT - 40} y1={y} x2={endX + 40} y2={y} stroke={isSelected ? '#fbbf24' : '#042f2e'} strokeWidth={isSelected ? 2.5 : 1} strokeDasharray={isSelected ? "0" : "5,10"} opacity={isSelected ? 1 : 0.25} strokeLinecap="round" />
+                    <text x={MAP_CONFIG.MARGIN_LEFT - 60} y={y} fontSize={22} fontFamily="Montserrat, sans-serif" fontWeight={isSelected ? "900" : "700"} fill={isSelected ? "#fbbf24" : "#0f766e"} dominantBaseline="middle" textAnchor="end" className="select-none cursor-pointer hover:opacity-80" onClick={() => onSelect(f.id.toString())}>
                       {f.nome.replace(/filare\s*/i, '')}
                     </text>
                   </g>
                 );
               })}
+            </g>
 
+            {/* LIVELLO 3: Il Vigneto (VITI RECAPITATE IN MODO COMPLETAMENTE STATICO) */}
+            <g id="vigneto-viti">
               {piante.map(p => {
                 const filare = filariMap[p.filare_id];
                 if (!filare) return null;
                 const isCustom = p.coord_x != null && p.coord_y != null;
-                const calc = calcCoords(filare, p.posizione_nel_filare);
-                const x = (isCustom ? p.coord_x! : calc.x) + (LABEL_X - 180);
-                const y = (isCustom ? p.coord_y! : calc.y) + (ROW_OFFSET_Y - 80);
+                const coords = calcCoords(filare, p.posizione_nel_filare);
+                const x = isCustom ? p.coord_x! : coords.x;
+                const y = isCustom ? p.coord_y! : coords.y;
 
                 return (
                   <PiantaCircle
-                    key={p.id} pianta={p} tipo={tipiMap[p.tipo_id]}
-                    cx={x} cy={y} isSelected={p.id === selectedId}
-                    onClick={onSelect} colorMode={colorMode}
+                    key={p.id}
+                    pianta={p}
+                    tipo={tipiMap[p.tipo_id]}
+                    cx={x}
+                    cy={y}
+                    isSelected={p.id === selectedId}
+                    onClick={onSelect}
+                    colorMode={colorMode}
                   />
                 );
               })}
             </g>
 
-            {/* --- LIVELLO 4: Frutteto (Dinamico) --- */}
-            <g id="frutteto">
-              {poi.filter(p => p.tipo === 'albero').map(tree => {
-                const config = ICON_MAP[tree.icona] || { icon: '🌳', isEmoji: true };
-                return (
-                  <g key={tree.id} transform={`translate(${tree.coord_x}, ${tree.coord_y})`} className="opacity-80 hover:opacity-100 transition-all cursor-pointer" onClick={() => onSelect(tree.id)}>
-                    {config.isEmoji ? (
-                      <text fontSize={32} dominantBaseline="middle" textAnchor="middle">{config.icon as string}</text>
-                    ) : (
-                      <config.icon size={30} color="#10b981" strokeWidth={1} />
-                    )}
-                    <text y="45" textAnchor="middle" className="text-[10px] font-mono font-bold fill-emerald-200 uppercase tracking-tighter">
-                      {tree.nome}
-                    </text>
-                  </g>
-                );
-              })}
-            </g>
-
-            {/* --- LIVELLO 5: Punti di Interesse (Dinamici) --- */}
-            <g id="poi">
-              {poi.filter(p => p.tipo !== 'albero').map(item => {
-                const config = ICON_MAP[item.icona] || { icon: Home, isEmoji: false };
-                const isEdificio = item.tipo === 'edificio';
-                const color = item.tipo === 'infrastruttura' ? '#3b82f6' : '#064e3b';
-                
-                return (
-                  <g key={item.id} transform={`translate(${item.coord_x}, ${item.coord_y})`} className="opacity-80 hover:opacity-100 transition-all cursor-pointer" onClick={() => onSelect(item.id)}>
-                    {isEdificio && <rect x="-10" y="-10" width="60" height="60" rx="20" fill="#fcfaf7" className="shadow-2xl" />}
-                    {config.isEmoji ? (
-                      <text fontSize={isEdificio ? 40 : 24} dominantBaseline="middle">{config.icon as string}</text>
-                    ) : (
-                      <config.icon size={isEdificio ? 40 : 24} color={color} strokeWidth={2} />
-                    )}
-                    <text x={isEdificio ? 60 : 35} y={isEdificio ? 25 : 15} className={`font-heading font-black text-xs uppercase tracking-widest ${isEdificio ? 'fill-slate-100' : 'fill-slate-300 opacity-60'}`}>
-                      {item.nome}
-                    </text>
-                  </g>
-                );
-              })}
-            </g>
+            {/* LIVELLI 4 e 5: Alberi e POI (Scalati fluidamente dal sotto-componente) */}
+            <DynamicPOILayers
+              poi={poi}
+              selectedId={selectedId}
+              onSelect={onSelect}
+            />
 
           </svg>
         </TransformComponent>

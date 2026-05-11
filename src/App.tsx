@@ -3,14 +3,15 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import HomePage from '@/pages/HomePage';
 import DashboardPage from '@/pages/DashboardPage';
+import InventarioPage from '@/pages/InventarioPage';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import { Menu, X } from 'lucide-react';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'map' | 'dashboard'>('map');
+  const [currentView, setCurrentView] = useState<'map' | 'dashboard' | 'inventory'>('map');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleView = (view: 'map' | 'dashboard') => {
+  const toggleView = (view: 'map' | 'dashboard' | 'inventory') => {
     setCurrentView(view);
     setIsMenuOpen(false);
   };
@@ -34,6 +35,13 @@ function App() {
             >
               Mappa
               {currentView === 'map' && <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-800" />}
+            </button>
+            <button 
+              onClick={() => setCurrentView('inventory')}
+              className={`relative py-2 text-xs font-black uppercase tracking-[0.2em] transition-all duration-500 ${currentView === 'inventory' ? 'text-slate-900' : 'text-slate-300 hover:text-slate-500'}`}
+            >
+              Inventario
+              {currentView === 'inventory' && <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-800" />}
             </button>
             <button 
               onClick={() => setCurrentView('dashboard')}
@@ -63,6 +71,12 @@ function App() {
               Mappa
             </button>
             <button 
+              onClick={() => toggleView('inventory')}
+              className={`text-4xl font-serif italic ${currentView === 'inventory' ? 'text-slate-900 font-black' : 'text-slate-300'}`}
+            >
+              Inventario
+            </button>
+            <button 
               onClick={() => toggleView('dashboard')}
               className={`text-4xl font-serif italic ${currentView === 'dashboard' ? 'text-slate-900 font-black' : 'text-slate-300'}`}
             >
@@ -74,7 +88,7 @@ function App() {
         {/* Main Content Viewport */}
         <div className="flex-1 overflow-hidden relative">
           <ErrorBoundary>
-            {currentView === 'map' ? <HomePage /> : <DashboardPage />}
+            {currentView === 'map' ? <HomePage /> : currentView === 'inventory' ? <InventarioPage /> : <DashboardPage />}
           </ErrorBoundary>
         </div>
       </div>

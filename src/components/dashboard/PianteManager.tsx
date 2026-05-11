@@ -8,7 +8,7 @@ import { PiantaBulkAdd } from '@/components/pianta/PiantaBulkAdd';
 import PiantaEditModal from '@/components/pianta/PiantaEditModal';
 import type { Pianta } from '@/types';
 
-export function PianteManager() {
+export default function PianteManager() {
   const { piante, createPianta, deletePianta } = usePiante();
   const { filari } = useFilari();
   const { tipi } = useTipiPianta();
@@ -90,7 +90,8 @@ export function PianteManager() {
                 <tr key={p.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex flex-col">
-                      <span className="font-mono font-black text-slate-900 text-sm tracking-tight">{p.id}</span>
+                      <span className="font-mono font-black text-slate-900 text-sm tracking-tight">{p.codice_etichetta}</span>
+                      <span className="text-[9px] font-medium text-slate-300 uppercase tracking-tighter truncate max-w-[100px]">{p.id}</span>
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{filare?.nome || '??'}</span>
                     </div>
                   </td>
@@ -150,7 +151,6 @@ export function PianteManager() {
       {/* Modals */}
       {isBulkAdding && (
         <PiantaBulkAdd 
-          onSubmit={handleBulkCreate}
           onClose={() => setIsBulkAdding(false)}
         />
       )}
