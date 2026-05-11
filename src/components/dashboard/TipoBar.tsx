@@ -1,21 +1,33 @@
 import type { TipoPianta } from '@/types';
+import { motion } from 'framer-motion';
 
 interface Props { tipo: TipoPianta; count: number; totale: number; }
 
 export function TipoBar({ tipo, count, totale }: Props) {
   const perc = totale > 0 ? Math.round((count / totale) * 100) : 0;
+  
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-4 h-4 rounded-full shrink-0" style={{ backgroundColor: tipo.colore_hex }} />
-      <div className="w-36 font-medium text-slate-700 truncate" title={tipo.nome}>{tipo.nome}</div>
-      <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden hidden sm:block">
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{ width: `${perc}%`, backgroundColor: tipo.colore_hex }}
+    <div className="group space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-3 h-3 rounded-full shadow-lg" style={{ backgroundColor: tipo.colore_hex }} />
+          <span className="font-bold text-slate-700 text-sm">{tipo.nome}</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-xs font-medium text-slate-400">{count} viti</span>
+          <span className="text-sm font-black text-slate-800 w-10 text-right">{perc}%</span>
+        </div>
+      </div>
+      
+      <div className="h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/50">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${perc}%` }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="h-full rounded-full shadow-lg"
+          style={{ backgroundColor: tipo.colore_hex }}
         />
       </div>
-      <div className="w-16 text-right text-sm text-slate-500">{count} pz</div>
-      <div className="w-12 text-right text-sm font-semibold text-slate-700">{perc}%</div>
     </div>
   );
 }

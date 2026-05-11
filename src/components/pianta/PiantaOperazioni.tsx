@@ -20,20 +20,25 @@ export default function PiantaOperazioni({ piantaId, onAdd }: Props) {
   if (isLoading) return <p className="text-sm text-slate-400">Caricamento operazioni...</p>;
 
   return (
-    <div className="space-y-3 mt-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-800">Ultime Operazioni</h3>
+    <div className="space-y-6 mt-8">
+      <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+        <div className="space-y-1">
+          <h3 className="text-sm font-heading font-black text-slate-900 uppercase tracking-widest">Diario Clinico</h3>
+          <p className="text-[10px] text-slate-400 font-medium italic">Storico degli interventi e trattamenti</p>
+        </div>
         <button 
           onClick={onAdd}
-          className="text-xs font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2 py-1 rounded"
+          className="text-[10px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-4 py-2 rounded-xl transition-all"
         >
-          + Aggiungi
+          + Nuova Nota
         </button>
       </div>
       
-      <div className="space-y-1">
+      <div className="space-y-3">
         {operazioni.length === 0 ? (
-          <p className="text-xs text-slate-400 italic">Nessuna operazione registrata.</p>
+          <div className="py-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-100">
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Nessun evento registrato</p>
+          </div>
         ) : (
           operazioni.slice(0, MAX_OPS_VISIBLE).map(op => (
             <OperazioneItem 

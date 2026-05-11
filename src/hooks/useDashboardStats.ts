@@ -18,7 +18,10 @@ export function useDashboardStats() {
   });
 
   const statoPiante = piante.reduce(
-    (acc, p) => { acc[p.stato]++; return acc; },
+    (acc, p) => { 
+      if (p.stato in acc) acc[p.stato]++; 
+      return acc; 
+    },
     { attiva: 0, morta: 0, ripiantata: 0 }
   );
 

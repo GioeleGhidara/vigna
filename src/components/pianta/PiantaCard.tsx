@@ -9,6 +9,8 @@ import type { Pianta, TipoPianta } from '@/types';
 interface Props {
   pianta: Pianta;
   tipo?: TipoPianta;
+  filareNome?: string;
+  filareVenditore?: string;
   onDelete: () => void;
   isRepositioning?: boolean;
   onStartReposition?: () => void;
@@ -16,7 +18,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default function PiantaCard({ pianta, tipo, onDelete, isRepositioning, onStartReposition, onCancelReposition, onClose }: Props) {
+export default function PiantaCard({ pianta, tipo, filareNome, filareVenditore, onDelete, isRepositioning, onStartReposition, onCancelReposition, onClose }: Props) {
   const [isOpModalOpen, setIsOpModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -37,7 +39,7 @@ export default function PiantaCard({ pianta, tipo, onDelete, isRepositioning, on
         </div>
       )}
 
-      <PiantaHeader pianta={pianta} tipo={tipo} />
+      <PiantaHeader pianta={pianta} tipo={tipo} filareNome={filareNome} filareVenditore={filareVenditore} />
       
       <PiantaOperazioni piantaId={pianta.id} onAdd={() => setIsOpModalOpen(true)} />
       

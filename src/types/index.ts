@@ -12,6 +12,7 @@ export interface Filare {
   descrizione?: string;
   numero_piante: number;
   note?: string;
+  venditore?: string;
 }
 
 export interface Pianta {
@@ -27,6 +28,7 @@ export interface Pianta {
   stato: 'attiva' | 'morta' | 'ripiantata';
   coord_x?: number;
   coord_y?: number;
+  venditore?: string;
 }
 
 export interface Operazione {
@@ -39,5 +41,16 @@ export interface Operazione {
   foto_url?: string;
 }
 
+export interface POI {
+  id: string;
+  nome: string;
+  tipo: 'infrastruttura' | 'albero' | 'edificio';
+  icona: string;
+  coord_x: number;
+  coord_y: number;
+  descrizione?: string;
+}
+
 export type PiantaInput = Omit<Pianta, 'id' | 'tipo'>;
 export type OperazioneInput = Omit<Operazione, 'id'>;
+export type POIInput = Omit<POI, 'id'>;

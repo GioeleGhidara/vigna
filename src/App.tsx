@@ -3,35 +3,79 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import HomePage from '@/pages/HomePage';
 import DashboardPage from '@/pages/DashboardPage';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import { Menu, X } from 'lucide-react';
 
 function App() {
   const [currentView, setCurrentView] = useState<'map' | 'dashboard'>('map');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleView = (view: 'map' | 'dashboard') => {
+    setCurrentView(view);
+    setIsMenuOpen(false);
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col h-screen w-screen overflow-hidden bg-white">
-        {/* Top Navigation */}
-        <header className="bg-slate-900 text-white h-14 flex items-center px-4 shrink-0 shadow-md z-20">
-          <div className="font-bold text-lg text-emerald-400 mr-8 hidden sm:block">🍷 Vigneto App</div>
-          <nav className="flex gap-2">
+      <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#fcfaf7] noise-bg">
+        {/* Responsive Boutique Header */}
+        <header className="h-20 lg:h-24 flex items-center justify-between px-6 lg:px-12 shrink-0 z-50 border-b border-slate-100 bg-[#fcfaf7]/80 backdrop-blur-md lg:bg-transparent">
+          <div className="flex items-baseline gap-3 lg:gap-4">
+            <h1 className="text-xl lg:text-3xl font-heading font-black text-slate-900 tracking-tighter">
+              Vigna <span className="font-light text-emerald-800">Fojachini</span>
+            </h1>
+          </div>
+          
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex gap-12">
             <button 
               onClick={() => setCurrentView('map')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${currentView === 'map' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+              className={`relative py-2 text-xs font-black uppercase tracking-[0.2em] transition-all duration-500 ${currentView === 'map' ? 'text-slate-900' : 'text-slate-300 hover:text-slate-500'}`}
+            >
+              Mappa
+              {currentView === 'map' && <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-800" />}
+            </button>
+            <button 
+              onClick={() => setCurrentView('dashboard')}
+              className={`relative py-2 text-xs font-black uppercase tracking-[0.2em] transition-all duration-500 ${currentView === 'dashboard' ? 'text-slate-900' : 'text-slate-300 hover:text-slate-500'}`}
+            >
+              Dashboard
+              {currentView === 'dashboard' && <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-800" />}
+            </button>
+          </nav>
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden p-2 text-slate-900"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </header>
+
+        {/* Mobile Navigation Overlay */}
+        {isMenuOpen && (
+          <div className="lg:hidden fixed inset-0 top-20 bg-[#fcfaf7] z-[60] flex flex-col p-8 gap-8 animate-in fade-in slide-in-from-top-4">
+            <button 
+              onClick={() => toggleView('map')}
+              className={`text-4xl font-serif italic ${currentView === 'map' ? 'text-slate-900 font-black' : 'text-slate-300'}`}
             >
               Mappa
             </button>
             <button 
-              onClick={() => setCurrentView('dashboard')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${currentView === 'dashboard' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+              onClick={() => toggleView('dashboard')}
+              className={`text-4xl font-serif italic ${currentView === 'dashboard' ? 'text-slate-900 font-black' : 'text-slate-300'}`}
             >
               Dashboard
             </button>
-          </nav>
-        </header>
+          </div>
+        )}
 
         {/* Main Content Viewport */}
         <div className="flex-1 overflow-hidden relative">
-          {currentView === 'map' ? <HomePage /> : <DashboardPage />}
+          <ErrorBoundary>
+            {currentView === 'map' ? <HomePage /> : <DashboardPage />}
+          </ErrorBoundary>
         </div>
       </div>
     </QueryClientProvider>
