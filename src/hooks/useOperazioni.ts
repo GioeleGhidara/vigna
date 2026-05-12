@@ -22,20 +22,23 @@ export const useOperazioni = (piantaId?: string) => {
   });
 
   const { mutateAsync: createOperazione } = useMutation({
-    mutationFn: (data: OperazioneInput) =>
-      supabase.from('operazioni').insert(data).throwOnError(),
+    mutationFn: async (data: OperazioneInput) => {
+      await supabase.from('operazioni').insert(data).throwOnError();
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
 
   const { mutateAsync: deleteOperazione } = useMutation({
-    mutationFn: (id: number) =>
-      supabase.from('operazioni').delete().eq('id', id).throwOnError(),
+    mutationFn: async (id: number) => {
+      await supabase.from('operazioni').delete().eq('id', id).throwOnError();
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
 
   const { mutateAsync: updateOperazione } = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<OperazioneInput> }) =>
-      supabase.from('operazioni').update(data).eq('id', id).throwOnError(),
+    mutationFn: async ({ id, data }: { id: number; data: Partial<OperazioneInput> }) => {
+      await supabase.from('operazioni').update(data).eq('id', id).throwOnError();
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
 

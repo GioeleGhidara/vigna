@@ -4,6 +4,7 @@ import MapCanvas from '@/components/map/MapCanvas';
 import PiantaCard from '@/components/pianta/PiantaCard';
 import POICard from '@/components/poi/POICard';
 import POIFormModal from '@/components/poi/POIFormModal';
+import PiantaEditModal from '@/components/pianta/PiantaEditModal';
 import { usePiante } from '@/hooks/usePiante';
 import { useFilari } from '@/hooks/useFilari';
 import { useTipiPianta } from '@/hooks/useTipiPianta';
@@ -16,12 +17,13 @@ export default function HomePage() {
   const [filtri, setFiltri] = useState<{ filare_id?: number; tipo_id?: number }>({});
   const [isFilterMobileOpen, setIsFilterMobileOpen] = useState(false);
   const [isPOIModalOpen, setIsPOIModalOpen] = useState(false);
+  const [editingPianta, setEditingPianta] = useState<any>(null);
   const [colorMode, setColorMode] = useState<'variety' | 'health'>('variety');
 
   const { filari, isLoading: loadingFilari } = useFilari();
   const { tipi, tipiMap, isLoading: loadingTipi } = useTipiPianta();
   const { piante, isLoading: loadingPiante, updatePianta, deletePianta } = usePiante(filtri);
-  const { poi, isLoading: loadingPOI, updatePOI, deletePOI } = usePOI();
+  const { poi, isLoading: loadingPOI, createPOI, updatePOI, deletePOI } = usePOI();
 
   const filariMap = Object.fromEntries(filari.map(f => [f.id, f]));
 
@@ -204,6 +206,7 @@ export default function HomePage() {
                       setSelectedId(undefined);
                     }
                   }}
+                  onEdit={() => setEditingPianta(selectedPianta)}
                   onClose={() => {
                     setSelectedId(undefined);
                     setRepositioningId(null);
@@ -212,7 +215,7 @@ export default function HomePage() {
               ) : selectedPOI && (
                 <POICard
                   poi={selectedPOI}
-                  onUpdate={updatePOI}
+                  onUpdate={async (id, data) => await updatePOI({ id, data })}
                   onDelete={async (id) => {
                     await deletePOI(id);
                     setSelectedId(undefined);
@@ -239,6 +242,13 @@ export default function HomePage() {
           await createPOI(data);
           setIsPOIModalOpen(false);
         }}
+      />
+    )}
+
+    {editingPianta && (
+      <PiantaEditModal 
+        pianta={editingPianta}
+        onClose={() => setEditingPianta(null)}
       />
     )}
     </>

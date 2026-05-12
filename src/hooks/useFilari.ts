@@ -21,20 +21,23 @@ export const useFilari = () => {
   });
 
   const { mutateAsync: createFilare } = useMutation({
-    mutationFn: (data: Partial<Filare>) => supabase.from('filari').insert(data).throwOnError(),
+    mutationFn: async (data: Partial<Filare>) => {
+      await supabase.from('filari').insert(data).throwOnError();
+    },
     onMutate: async (newFilare) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<Filare[]>([QUERY_KEY]);
       qc.setQueryData<Filare[]>([QUERY_KEY], old => [...(old || []), { ...newFilare, id: Math.random() } as Filare]);
       return { previous };
     },
-    onError: (err, newFilare, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onError: (_err, _newFilare, context) => qc.setQueryData([QUERY_KEY], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: updateFilare } = useMutation({
-    mutationFn: ({ id, data }: { id: number, data: Partial<Filare> }) => 
-      supabase.from('filari').update(data).eq('id', id).throwOnError(),
+    mutationFn: async ({ id, data }: { id: number, data: Partial<Filare> }) => {
+      await supabase.from('filari').update(data).eq('id', id).throwOnError();
+    },
     onMutate: async ({ id, data }) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<Filare[]>([QUERY_KEY]);
@@ -43,19 +46,21 @@ export const useFilari = () => {
       );
       return { previous };
     },
-    onError: (err, variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onError: (_err, _variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: deleteFilare } = useMutation({
-    mutationFn: (id: number) => supabase.from('filari').delete().eq('id', id).throwOnError(),
+    mutationFn: async (id: number) => {
+      await supabase.from('filari').delete().eq('id', id).throwOnError();
+    },
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<Filare[]>([QUERY_KEY]);
       qc.setQueryData<Filare[]>([QUERY_KEY], old => old?.filter(f => f.id !== id));
       return { previous };
     },
-    onError: (err, id, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onError: (_err, _id, context) => qc.setQueryData([QUERY_KEY], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 

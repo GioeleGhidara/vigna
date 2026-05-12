@@ -10,6 +10,7 @@ import { TipoBar } from '@/components/dashboard/TipoBar';
 import TipiManager from '@/components/dashboard/TipiManager';
 import FilariManager from '@/components/dashboard/FilariManager';
 import POIManager from '@/components/dashboard/POIManager';
+import VenditoreBulkTool from '@/components/dashboard/VenditoreBulkTool';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 
 export default function DashboardPage() {
@@ -116,7 +117,7 @@ export default function DashboardPage() {
               <StatCard label="Piante Attive" value={statoPiante.attiva} color="emerald" icon="Leaf" />
               <StatCard label="Piante Morte" value={statoPiante.morta} color="red" icon="Wind" />
               <StatCard label="Rimpiazzi" value={statoPiante.ripiantata} color="amber" icon="RotateCcw" />
-              <StatCard label="Operazioni" value={operazioni.length} color="blue" icon="Trello" />
+              <StatCard label="Operazioni" value={operazioni.length} color="blue" icon="Activity" />
             </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
@@ -171,6 +172,10 @@ export default function DashboardPage() {
             
             <AccordionSection id="poi" title="Punti di Interesse" count={poi.length}>
               <POIManager />
+            </AccordionSection>
+
+            <AccordionSection id="bulk" title="Assegnazione Lotti" count={1}>
+              <VenditoreBulkTool />
             </AccordionSection>
           </div>
         )}

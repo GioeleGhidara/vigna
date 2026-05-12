@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Scissors, Droplets, Leaf, Wine, Eye, Link2,
-  Calendar, Check, X, Sparkles, AlertCircle
+  Check, X, Sparkles, AlertCircle
 } from 'lucide-react';
 
 // 1. Configurazioni visive ed ergonomiche per le operazioni principali

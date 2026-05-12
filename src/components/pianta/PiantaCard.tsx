@@ -1,6 +1,6 @@
 import {
   X, MapPin, Calendar, Tag, Trash2, Move, AlertTriangle,
-  CheckCircle2, PlusCircle, HelpCircle
+  CheckCircle2, PlusCircle, HelpCircle, Edit2
 } from 'lucide-react';
 import type { Pianta, TipoPianta } from '@/types';
 
@@ -13,6 +13,7 @@ interface Props {
   onStartReposition: () => void;
   onCancelReposition: () => void;
   onDelete: () => void;
+  onEdit: () => void;
   onClose: () => void;
 }
 
@@ -25,6 +26,7 @@ export default function PiantaCard({
   onStartReposition,
   onCancelReposition,
   onDelete,
+  onEdit,
   onClose
 }: Props) {
 
@@ -85,11 +87,15 @@ export default function PiantaCard({
         </div>
       </div>
 
-      {/* INFO VENDITORE (Se presente) */}
-      {filareVenditore && (
+      {/* INFO VENDITORE (Priorità alla pianta, fallback al filare) */}
+      {(pianta.venditore || filareVenditore) && (
         <div className="p-6 rounded-3xl border border-emerald-100 bg-emerald-50/30">
-          <h4 className="text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-1">Origine / Vivaio</h4>
-          <p className="text-sm font-bold text-emerald-900">{filareVenditore}</p>
+          <h4 className="text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-1">
+            {pianta.venditore ? 'Origine Specifica (Rimpiazzo)' : 'Origine Filare'}
+          </h4>
+          <p className="text-sm font-bold text-emerald-900">
+            {pianta.venditore || filareVenditore}
+          </p>
         </div>
       )}
 
@@ -104,6 +110,14 @@ export default function PiantaCard({
         >
           <Move size={16} />
           {isRepositioning ? 'Annulla Spostamento' : 'Sposta in Mappa'}
+        </button>
+
+        <button
+          onClick={onEdit}
+          className="w-full py-5 rounded-[2rem] flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-emerald-900 transition-all shadow-lg"
+        >
+          <Edit2 size={16} />
+          Modifica Dati
         </button>
 
         <button

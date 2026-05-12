@@ -23,20 +23,23 @@ export const usePiante = (filtri?: { filare_id?: number; tipo_id?: number }) => 
   });
 
   const { mutateAsync: createPianta } = useMutation({
-    mutationFn: (data: PiantaInput) => supabase.from('piante').insert(data).throwOnError(),
+    mutationFn: async (data: PiantaInput) => {
+      await supabase.from('piante').insert(data).throwOnError();
+    },
     onMutate: async (newPianta) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<Pianta[]>([QUERY_KEY, filtri]);
       qc.setQueryData<Pianta[]>([QUERY_KEY, filtri], old => [...(old || []), newPianta as Pianta]);
       return { previous };
     },
-    onError: (err, newPianta, context) => qc.setQueryData([QUERY_KEY, filtri], context?.previous),
+    onError: (_err, _newPianta, context) => qc.setQueryData([QUERY_KEY, filtri], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: updatePianta } = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Pianta> }) =>
-      supabase.from('piante').update(data).eq('id', id).throwOnError(),
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Pianta> }) => {
+      await supabase.from('piante').update(data).eq('id', id).throwOnError();
+    },
     onMutate: async ({ id, data }) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<Pianta[]>([QUERY_KEY, filtri]);
@@ -45,19 +48,21 @@ export const usePiante = (filtri?: { filare_id?: number; tipo_id?: number }) => 
       );
       return { previous };
     },
-    onError: (err, variables, context) => qc.setQueryData([QUERY_KEY, filtri], context?.previous),
+    onError: (_err, _variables, context) => qc.setQueryData([QUERY_KEY, filtri], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: deletePianta } = useMutation({
-    mutationFn: (id: string) => supabase.from('piante').delete().eq('id', id).throwOnError(),
+    mutationFn: async (id: string) => {
+      await supabase.from('piante').delete().eq('id', id).throwOnError();
+    },
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<Pianta[]>([QUERY_KEY, filtri]);
       qc.setQueryData<Pianta[]>([QUERY_KEY, filtri], old => old?.filter(p => p.id !== id));
       return { previous };
     },
-    onError: (err, id, context) => qc.setQueryData([QUERY_KEY, filtri], context?.previous),
+    onError: (_err, _id, context) => qc.setQueryData([QUERY_KEY, filtri], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 

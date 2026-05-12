@@ -28,12 +28,6 @@ export default function PianteManager() {
     setIsAdding(false);
   };
 
-  const handleBulkCreate = async (pianteList: any[]) => {
-    // Inseriamo in serie (Supabase insert accetta array)
-    for (const p of pianteList) {
-      await createPianta(p);
-    }
-  };
 
   return (
     <div className="space-y-8">

@@ -20,51 +20,58 @@ export const usePOI = () => {
   });
 
   const { mutateAsync: createPOI } = useMutation({
-    mutationFn: (data: POIInput) => supabase.from('punti_interesse').insert(data).throwOnError(),
+    mutationFn: async (data: POIInput) => {
+      await supabase.from('punti_interesse').insert(data).throwOnError();
+    },
     onMutate: async (newPOI) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<POI[]>([QUERY_KEY]);
       qc.setQueryData<POI[]>([QUERY_KEY], old => [...(old || []), { ...newPOI, id: Math.random().toString() } as POI]);
       return { previous };
     },
-    onError: (err, variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onError: (_err, _variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: updatePOI } = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: Partial<POI> }) => 
-      supabase.from('punti_interesse').update(data).eq('id', id).throwOnError(),
+    mutationFn: async ({ id, data }: { id: string, data: Partial<POI> }) => {
+      await supabase.from('punti_interesse').update(data).eq('id', id).throwOnError();
+    },
     onMutate: async ({ id, data }) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<POI[]>([QUERY_KEY]);
       qc.setQueryData<POI[]>([QUERY_KEY], old => old?.map(p => p.id === id ? { ...p, ...data } : p));
       return { previous };
     },
-    onError: (err, variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onError: (_err, _variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: deletePOI } = useMutation({
-    mutationFn: (id: string) => supabase.from('punti_interesse').delete().eq('id', id).throwOnError(),
+    mutationFn: async (id: string) => {
+      await supabase.from('punti_interesse').delete().eq('id', id).throwOnError();
+    },
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<POI[]>([QUERY_KEY]);
       qc.setQueryData<POI[]>([QUERY_KEY], old => old?.filter(p => p.id !== id));
       return { previous };
     },
-    onError: (err, id, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onError: (_err, _id, context) => qc.setQueryData([QUERY_KEY], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: clearAllPOI } = useMutation({
-    mutationFn: () => supabase.from('punti_interesse').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError(),
+    mutationFn: async () => {
+      await supabase.from('punti_interesse').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+    },
     onMutate: async () => {
       await qc.cancelQueries({ queryKey: [QUERY_KEY] });
       const previous = qc.getQueryData<POI[]>([QUERY_KEY]);
       qc.setQueryData<POI[]>([QUERY_KEY], []);
       return { previous };
     },
-    onError: (err, variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
+    onError: (_err, _variables, context) => qc.setQueryData([QUERY_KEY], context?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 

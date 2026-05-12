@@ -1,7 +1,6 @@
 import { usePOI } from '@/hooks/usePOI';
 import { useState } from 'react';
 import { Trash2, MapPin, Plus, Search, Home, Droplets, Gauge, Trees, Building2, Apple, Cherry } from 'lucide-react';
-import type { POI } from '@/types';
 
 const ICON_OPTIONS = [
   { id: 'Home', label: 'Casa/Villa', icon: Home, color: 'text-slate-900' },

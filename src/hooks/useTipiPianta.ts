@@ -20,20 +20,23 @@ export const useTipiPianta = () => {
   const tipiMap = Object.fromEntries(tipi.map((t) => [t.id, t]));
 
   const { mutateAsync: createTipo } = useMutation({
-    mutationFn: (data: Partial<TipoPianta>) => 
-      supabase.from('tipi_pianta').insert(data).throwOnError(),
+    mutationFn: async (data: Partial<TipoPianta>) => {
+      await supabase.from('tipi_pianta').insert(data).throwOnError();
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: updateTipo } = useMutation({
-    mutationFn: ({ id, data }: { id: number, data: Partial<TipoPianta> }) => 
-      supabase.from('tipi_pianta').update(data).eq('id', id).throwOnError(),
+    mutationFn: async ({ id, data }: { id: number, data: Partial<TipoPianta> }) => {
+      await supabase.from('tipi_pianta').update(data).eq('id', id).throwOnError();
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 
   const { mutateAsync: deleteTipo } = useMutation({
-    mutationFn: (id: number) => 
-      supabase.from('tipi_pianta').delete().eq('id', id).throwOnError(),
+    mutationFn: async (id: number) => {
+      await supabase.from('tipi_pianta').delete().eq('id', id).throwOnError();
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: [QUERY_KEY] }),
   });
 

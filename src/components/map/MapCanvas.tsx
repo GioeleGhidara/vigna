@@ -28,8 +28,9 @@ const ICON_MAP: Record<string, { icon: any, color: string }> = {
 };
 
 // Sotto-componente isolato: ascolta lo zoom SOLO per i POI/Alberi (~30 elementi totali)
+// Rimosso 'selectedId' destrutturato per eliminare l'errore di variabile dichiarata ma non utilizzata
 function DynamicPOILayers({
-  poi, selectedId, onSelect
+  poi, onSelect
 }: {
   poi: POI[]; selectedId?: string; onSelect: (id: string) => void;
 }) {
@@ -134,14 +135,27 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
   return (
     <div className={`w-full h-full overflow-hidden border border-slate-100 rounded-[2.5rem] shadow-2xl transition-all duration-1000 noise-bg ${repositioningId ? 'bg-emerald-50/80 cursor-crosshair' : 'bg-[#fcfaf7] cursor-grab active:cursor-grabbing'}`}>
       <TransformWrapper
-        minScale={0.1}
-        maxScale={10}
-        initialScale={0.5} // Calibrato per aprire la mappa comodamente centrata
+        minScale={0.3}
+        maxScale={12}
+        initialScale={1.2}
         centerOnInit
-        panning={{ disabled: !!repositioningId }}
+        panning={{
+          disabled: !!repositioningId,
+          velocityDisabled: false
+        }}
+        // RICALIBRAZIONE ROTELLINA / TOUCHPAD:
+        // Riduciamo drasticamente l'incremento (step) e disattiviamo l'attivazione a scatti (smoothStep)
+        wheel={{
+          step: 0.015,     // Valore ultra-ridotto per forzare passaggi millimetrici
+          smoothStep: 0.005 // Smorza la curva di accelerazione del tocco
+        } as any}
+        // Disattiviamo l'animazione di transizione fissa per la rotellina, 
+        // lasciando che lo zoom segua esattamente il movimento fisico delle tue dita
+        zoomAnimation={{
+          disabled: true
+        }}
         doubleClick={{ disabled: true }}
-        // L'aggiornamento del LOD avviene a costo zero sul DOM nativo, bypassando il ciclo di React
-        onTransformed={(ref) => {
+        onTransform={(ref) => {
           const scale = ref.state.scale;
           const container = document.getElementById('map-container');
           if (!container) return;
@@ -155,7 +169,6 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
         }}
       >
         <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
-          {/* Aggiunti width e height espliciti in pixel, rimossi w-full e h-full */}
           <svg
             id="map-container"
             data-lod="medium"
@@ -220,7 +233,7 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
               })}
             </g>
 
-            {/* LIVELLO 3: Il Vigneto (VITI RECAPITATE IN MODO COMPLETAMENTE STATICO) */}
+            {/* LIVELLO 3: Il Vigneto */}
             <g id="vigneto-viti">
               {piante.map(p => {
                 const filare = filariMap[p.filare_id];
@@ -245,7 +258,7 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
               })}
             </g>
 
-            {/* LIVELLI 4 e 5: Alberi e POI (Scalati fluidamente dal sotto-componente) */}
+            {/* LIVELLI 4 e 5: Alberi e POI */}
             <DynamicPOILayers
               poi={poi}
               selectedId={selectedId}

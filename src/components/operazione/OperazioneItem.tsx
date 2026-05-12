@@ -6,7 +6,6 @@ interface Props {
 }
 
 export default function OperazioneItem({ operazione: op, onDelete }: Props) {
-  const data = new Date(op.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
   return (
     <div className="flex gap-4 p-4 rounded-2xl bg-white border border-slate-50 shadow-sm group relative hover:shadow-md transition-all">
       <div className="flex flex-col items-center justify-center bg-slate-50 px-3 py-2 rounded-xl min-w-[60px]">
