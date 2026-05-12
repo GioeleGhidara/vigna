@@ -27,11 +27,13 @@ function App() {
       <BrowserRouter>
         <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#fcfaf7] noise-bg">
           
-          {/* Header */}
-          <header className="h-20 lg:h-24 flex items-center justify-between px-6 lg:px-12 shrink-0 z-[100] border-b border-slate-100 bg-[#fcfaf7]/80 backdrop-blur-md lg:bg-transparent">
-            <h1 className="text-xl lg:text-3xl font-heading font-black text-slate-900 tracking-tighter">
-              Vigna <span className="font-light text-emerald-800">Fojachini</span>
-            </h1>
+          {/* Responsive Boutique Header ottimizzato per mobile */}
+          <header className="h-auto min-h-[5rem] lg:h-24 flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3 shrink-0 z-[100] border-b border-slate-100 bg-[#fcfaf7]/80 backdrop-blur-md lg:bg-transparent">
+            <div className="flex items-baseline gap-2">
+              <h1 className="text-lg sm:text-xl lg:text-3xl font-heading font-black text-slate-900 tracking-tighter leading-tight">
+                Vigna <span className="font-light text-emerald-800 block sm:inline">Fojachini</span>
+              </h1>
+            </div>
             
             {/* Navigazione Desktop */}
             <nav className="hidden lg:flex gap-12">

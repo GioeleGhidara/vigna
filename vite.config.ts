@@ -1,30 +1,46 @@
-import path from "path"
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
+import path from 'path';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      registerType: 'autoUpdate', // Aggiorna l'app automaticamente quando cambi codice
+      includeAssets: ['favicon.svg', 'icons.svg', 'hero.png'], // Risorse da mettere in cache subito
       manifest: {
         name: 'Vigna Fojachini',
-        short_name: 'Vigna App',
-        description: 'Gestione Digitale Vigneto Fojachini',
-        theme_color: '#064e3b',
+        short_name: 'Fojachini',
+        description: 'Gemello Digitale del Vigneto',
+        theme_color: '#fcfaf7',
+        background_color: '#fcfaf7',
+        display: 'standalone',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'favicon.svg',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/svg+xml'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'favicon.svg',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/svg+xml'
+          }
+        ]
+      },
+      workbox: {
+        // Questa sezione dice all'app di salvare tutto il codice JS e CSS in cache
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [
+          {
+            // Cache per i font di Google (se usati) o icone esterne
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }
+            }
           }
         ]
       }
@@ -35,4 +51,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-})
+});
