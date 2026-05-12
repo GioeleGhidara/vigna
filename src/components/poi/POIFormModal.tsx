@@ -21,7 +21,7 @@ const ICON_OPTIONS = [
   { id: 'Limone', icon: Citrus, label: 'Limone' },
   { id: 'Ciliegio', icon: Cherry, label: 'Ciliegio' },
   { id: 'Vite', icon: Leaf, label: 'Vite' },
-  { id: 'Pesco', icon: Flower2, label: 'Pesco' },
+  { id: 'Ulivo', icon: Trees, label: 'Ulivo' },
   { id: 'Albero', icon: Trees, label: 'Albero Gen.' },
 ];
 
