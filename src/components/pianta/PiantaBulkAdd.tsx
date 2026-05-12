@@ -18,10 +18,10 @@ export function PiantaBulkAdd({ onClose }: { onClose?: () => void }) {
   const [form, setForm] = useState({
     filare_id: '',
     tipo_id: '',
-    prefisso: 'VIG',
     startPos: 1,
     quantita: 50,
     anno_impianto: new Date().getFullYear(),
+    venditore: '',
   });
 
   const handleBulkInsert = async (e: React.FormEvent) => {
@@ -39,12 +39,15 @@ export function PiantaBulkAdd({ onClose }: { onClose?: () => void }) {
       const filareIdNum = parseInt(form.filare_id);
       const tipoIdNum = parseInt(form.tipo_id);
 
+      const filare = filari.find(f => f.id === filareIdNum);
+      const rowPrefix = filare ? filare.nome.replace(/filare\s*/i, '').trim().toUpperCase() : 'P';
+
       // Generiamo l'array di payload senza il campo 'id'
       const pianteDaInserire: PiantaInput[] = Array.from(
         { length: form.quantita }, 
         (_, indice) => {
           const posizione = form.startPos + indice;
-          const etichetta = `${form.prefisso}-${posizione.toString().padStart(3, '0')}`;
+          const etichetta = `${rowPrefix}-${posizione.toString().padStart(3, '0')}`;
 
           return {
             filare_id: filareIdNum,
@@ -53,6 +56,7 @@ export function PiantaBulkAdd({ onClose }: { onClose?: () => void }) {
             posizione_nel_filare: posizione,
             codice_etichetta: etichetta,
             anno_impianto: form.anno_impianto,
+            venditore: form.venditore,
             coord_x: null,
             coord_y: null,
           };
@@ -142,15 +146,15 @@ export function PiantaBulkAdd({ onClose }: { onClose?: () => void }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Prefisso</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pos. Iniziale</label>
               <input
-                type="text"
-                value={form.prefisso}
-                onChange={e => setForm({ ...form, prefisso: e.target.value.toUpperCase() })}
+                type="number"
+                min="1"
+                value={form.startPos}
+                onChange={e => setForm({ ...form, startPos: parseInt(e.target.value) || 1 })}
                 className="w-full bg-white border border-slate-100 p-4 text-sm font-mono font-bold rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-emerald-800"
-                placeholder="es. F1"
               />
             </div>
 
@@ -178,14 +182,26 @@ export function PiantaBulkAdd({ onClose }: { onClose?: () => void }) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Anno Impianto</label>
-            <input
-              type="number"
-              value={form.anno_impianto}
-              onChange={e => setForm({ ...form, anno_impianto: parseInt(e.target.value) || 2024 })}
-              className="w-full bg-white border border-slate-100 p-4 text-sm font-bold rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-emerald-800"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Anno Impianto</label>
+              <input
+                type="number"
+                value={form.anno_impianto}
+                onChange={e => setForm({ ...form, anno_impianto: parseInt(e.target.value) || 2024 })}
+                className="w-full bg-white border border-slate-100 p-4 text-sm font-bold rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-emerald-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Venditore / Vivaio</label>
+              <input
+                type="text"
+                value={form.venditore}
+                onChange={e => setForm({ ...form, venditore: e.target.value })}
+                placeholder="es. Montina"
+                className="w-full bg-white border border-slate-100 p-4 text-sm font-bold rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-emerald-800"
+              />
+            </div>
           </div>
 
           <footer className="pt-2 flex gap-4">
