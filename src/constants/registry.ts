@@ -1,15 +1,13 @@
 /**
  * Registro centrale delle costanti del vigneto.
- * Modificando questi valori qui, verranno aggiornati in tutta l'applicazione.
+ * Aggrega i dati dai file specifici in src/data.
  */
 
-export const PRODUTTORI_LIST = [
-  "Gallo Silvio (Stella)",
-  "Vivai Donato (Cenaia PI)",
-  "Pamparino Sara (Finale Ligure)",
-  "Negro Carlo (Dogliani)",
-  "Vivaio Revella (Quiliano)"
-];
+import { VENDOR_NAMES } from '../data/vendors';
+
+export { VENDORS, VENDOR_NAMES as PRODUTTORI_LIST } from '../data/vendors';
+export { GRAPE_VARIETIES } from '../data/grapes';
+export { LANDMARK_TYPES, PREDEFINED_POIS } from '../data/landmarks';
 
 export const STATI_PIANTA = [
   { id: 'attiva', label: 'In Salute', color: 'emerald' },
