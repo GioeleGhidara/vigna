@@ -3,14 +3,8 @@ import { useFilari } from '@/hooks/useFilari';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 import { Package, Check, AlertCircle, ArrowRight } from 'lucide-react';
+import { PRODUTTORI_LIST } from '@/constants/registry';
 
-const PRODUTTORI_LIST = [
-  "Gallo Silvio (Stella)",
-  "Vivai Donato (Cenaia PI)",
-  "Pamparino Sara (Finale Ligure)",
-  "Negro Carlo (Dogliani)",
-  "Vivaio Revella (Quiliano)"
-];
 
 export default function VenditoreBulkTool() {
   const { filari } = useFilari();

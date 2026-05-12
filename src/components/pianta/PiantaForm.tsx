@@ -3,6 +3,7 @@ import { useFilari } from '@/hooks/useFilari';
 import { useTipiPianta } from '@/hooks/useTipiPianta';
 import { MapPin, List, ChevronRight } from 'lucide-react';
 import type { Pianta } from '@/types';
+import { STATI_PIANTA, PRODUTTORI_LIST, ANNO_CORRENTE } from '@/constants/registry';
 
 interface Props {
   initialData?: Partial<Pianta>;
@@ -24,7 +25,7 @@ export function PiantaForm({ initialData, onSubmit, onClose, title }: Props) {
     posizione_nel_filare: initialData?.posizione_nel_filare ?? 1,
     coord_x: initialData?.coord_x ?? null,
     coord_y: initialData?.coord_y ?? null,
-    anno_impianto: initialData?.anno_impianto ?? new Date().getFullYear(),
+    anno_impianto: initialData?.anno_impianto ?? ANNO_CORRENTE,
     porta_innesto: initialData?.porta_innesto ?? '',
     note: initialData?.note ?? '',
     venditore: initialData?.venditore ?? '',
@@ -111,14 +112,14 @@ export function PiantaForm({ initialData, onSubmit, onClose, title }: Props) {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Stato della Salute</label>
                 <div className="flex gap-2">
-                  {['attiva', 'morta', 'ripiantata'].map(s => (
+                  {STATI_PIANTA.map(s => (
                     <button
-                      key={s}
+                      key={s.id}
                       type="button"
-                      onClick={() => setForm({...form, stato: s as any})}
-                      className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${form.stato === s ? 'bg-slate-900 border-slate-900 text-white shadow-lg scale-105' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-300'}`}
+                      onClick={() => setForm({...form, stato: s.id as any})}
+                      className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${form.stato === s.id ? 'bg-slate-900 border-slate-900 text-white shadow-lg scale-105' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-300'}`}
                     >
-                      {s}
+                      {s.label.split(' ')[0]}
                     </button>
                   ))}
                 </div>
@@ -222,7 +223,7 @@ export function PiantaForm({ initialData, onSubmit, onClose, title }: Props) {
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Produttore / Vivaio (Specifica per questa pianta)</label>
               <div className="flex flex-wrap gap-2 mb-2">
-                {["Gallo Silvio", "Vivai Donato", "Pamparino Sara", "Negro Carlo", "Vivaio Revella"].map(p => (
+                {PRODUTTORI_LIST.map(p => (
                   <button
                     key={p}
                     type="button"

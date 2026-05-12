@@ -3,14 +3,8 @@ import { useFilari } from '@/hooks/useFilari';
 import { Plus, Trash2, Edit2, Check, GripVertical, Wand2, X } from 'lucide-react';
 import type { Filare } from '@/types';
 import FilareWizard from './FilareWizard';
+import { PRODUTTORI_LIST } from '@/constants/registry';
 
-const PRODUTTORI_LIST = [
-  "Gallo Silvio (Stella)",
-  "Vivai Donato (Cenaia PI)",
-  "Pamparino Sara (Finale Ligure)",
-  "Negro Carlo (Dogliani)",
-  "Vivaio Revella (Quiliano)"
-];
 
 export default function FilariManager() {
   const { filari, createFilare, updateFilare, deleteFilare } = useFilari();

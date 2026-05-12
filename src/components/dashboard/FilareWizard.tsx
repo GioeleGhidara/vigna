@@ -4,6 +4,7 @@ import { useTipiPianta } from '@/hooks/useTipiPianta';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowRight, Check, Trash2, Sparkles } from 'lucide-react';
+import { PRODUTTORI_LIST } from '@/constants/registry';
 
 export default function FilareWizard({ onFinish }: { onFinish: () => void }) {
   const { filari } = useFilari();
@@ -154,10 +155,22 @@ export default function FilareWizard({ onFinish }: { onFinish: () => void }) {
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nome Produttore / Vivaio</label>
               <input 
-                placeholder="es. Montina" 
-                className="w-full p-3 bg-slate-50 rounded-xl border-none text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-800"
-                value={currentVenditore} onChange={e => setCurrentVenditore(e.target.value)}
-              />
+              placeholder="es. Montina" 
+              className="w-full p-3 bg-slate-50 rounded-xl border-none text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-800"
+              value={currentVenditore} onChange={e => setCurrentVenditore(e.target.value)}
+            />
+            <div className="flex flex-wrap gap-2">
+              {PRODUTTORI_LIST.map(p => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setCurrentVenditore(p)}
+                  className="px-2 py-1 bg-white border border-slate-100 rounded-full text-[8px] font-black uppercase tracking-widest text-slate-400 hover:border-emerald-500 hover:text-emerald-700 transition-all"
+                >
+                  {p.split(' ')[0]}
+                </button>
+              ))}
+            </div>
             </div>
             <div className="flex gap-3">
               <div className="flex-1 space-y-2">

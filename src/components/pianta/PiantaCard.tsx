@@ -3,6 +3,7 @@ import {
   CheckCircle2, PlusCircle, HelpCircle, Edit2
 } from 'lucide-react';
 import type { Pianta, TipoPianta } from '@/types';
+import { STATI_PIANTA } from '@/constants/registry';
 
 interface Props {
   pianta: Pianta;
@@ -30,14 +31,17 @@ export default function PiantaCard({
   onClose
 }: Props) {
 
-  // Mappatura visiva degli stati
+  // Mappatura visiva degli stati centralizzata
+  const currentStatus = STATI_PIANTA.find(s => s.id === pianta.stato);
+  
   const statusConfig = {
-    attiva: { icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', label: 'In Salute' },
-    morta: { icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50', label: 'Morta / Da Rimpiazzare' },
-    ripiantata: { icon: PlusCircle, color: 'text-blue-600', bg: 'bg-blue-50', label: 'Nuovo Innesto' },
+    attiva: { icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    morta: { icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
+    ripiantata: { icon: PlusCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
   };
-
-  const status = statusConfig[pianta.stato] || { icon: HelpCircle, color: 'text-slate-400', bg: 'bg-slate-50', label: 'Stato Ignoto' };
+ 
+  const style = statusConfig[pianta.stato as keyof typeof statusConfig] || { icon: HelpCircle, color: 'text-slate-400', bg: 'bg-slate-50' };
+  const label = currentStatus?.label || 'Stato Ignoto';
 
   return (
     <div className="flex flex-col h-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -45,9 +49,9 @@ export default function PiantaCard({
       {/* HEADER: Identità della Pianta */}
       <header className="flex justify-between items-start">
         <div className="space-y-1">
-          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${status.bg} ${status.color}`}>
-            <status.icon size={12} />
-            <span className="text-[10px] font-black uppercase tracking-widest">{status.label}</span>
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${style.bg} ${style.color}`}>
+            <style.icon size={12} />
+            <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
           </div>
           <h2 className="text-4xl font-heading font-black text-slate-900 tracking-tighter italic">
             {pianta.codice_etichetta || `Vite P${pianta.posizione_nel_filare}`}

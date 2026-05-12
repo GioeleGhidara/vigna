@@ -5,6 +5,7 @@ import PiantaCard from '@/components/pianta/PiantaCard';
 import POICard from '@/components/poi/POICard';
 import POIFormModal from '@/components/poi/POIFormModal';
 import PiantaEditModal from '@/components/pianta/PiantaEditModal';
+import FilterSidebar from '@/components/map/FilterSidebar';
 import { usePiante } from '@/hooks/usePiante';
 import { useFilari } from '@/hooks/useFilari';
 import { useTipiPianta } from '@/hooks/useTipiPianta';
@@ -44,116 +45,26 @@ export default function HomePage() {
   const selectedPianta = piante.find(p => p.id === selectedId);
   const selectedPOI = poi.find(p => p.id === selectedId);
 
-  const setFiltro = <K extends keyof typeof filtri>(k: K, v: string) => {
-    setFiltri(prev => ({ ...prev, [k]: v === "" ? undefined : parseInt(v) }));
-  };
 
-  if (loadingFilari || loadingTipi || loadingPiante || loadingPOI) return null;
+    if (loadingFilari || loadingTipi || loadingPiante || loadingPOI) return null;
 
-  const FilterContent = () => (
-    <div className="space-y-8">
-      <header className="flex justify-end items-start lg:hidden">
-        <button className="p-2" onClick={() => setIsFilterMobileOpen(false)}>
-          <X size={20} className="text-slate-400" />
-        </button>
-      </header>
-
-      <div className="space-y-10">
-        <div className="space-y-4">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Visualizzazione</label>
-          <div className="flex bg-slate-100 p-1.5 rounded-2xl">
-            <button 
-              onClick={() => setColorMode('variety')}
-              className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${colorMode === 'variety' ? 'bg-white text-slate-900 shadow-sm scale-[1.02]' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Varietà
-            </button>
-            <button 
-              onClick={() => setColorMode('health')}
-              className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${colorMode === 'health' ? 'bg-white text-emerald-900 shadow-sm scale-[1.02]' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Salute
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Filtra Filare</label>
-          <select 
-            className="w-full bg-white border border-slate-100 p-4 text-sm font-bold rounded-2xl shadow-sm focus:ring-2 focus:ring-emerald-800 outline-none appearance-none cursor-pointer"
-            value={filtri.filare_id || ''}
-            onChange={(e) => { setFiltro('filare_id', e.target.value); if (window.innerWidth < 1024) setIsFilterMobileOpen(false); }}
-          >
-            <option value="">Tutti i Filari</option>
-            {filari.map(f => (
-              <option key={f.id} value={f.id}>{f.nome.replace(/filare\s*/i, '')}</option>
-            ))}
-          </select>
-        </div>
+    return (
+      <>
+      <div className="flex h-full w-full overflow-hidden bg-transparent lg:p-6 lg:pt-0 gap-10 relative">
         
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Varietà</label>
-          <select 
-            className="w-full bg-white border border-slate-100 p-4 text-sm font-bold rounded-2xl shadow-sm focus:ring-2 focus:ring-emerald-800 outline-none appearance-none cursor-pointer"
-            value={filtri.tipo_id || ''}
-            onChange={(e) => { setFiltro('tipo_id', e.target.value); if (window.innerWidth < 1024) setIsFilterMobileOpen(false); }}
-          >
-            <option value="">Tutte le Varietà</option>
-            {tipi.map(t => (
-              <option key={t.id} value={t.id}>{t.nome}</option>
-            ))}
-          </select>
-        </div>
-        <div className="pt-4">
-          <button 
-            onClick={() => setIsPOIModalOpen(true)}
-            className="w-full py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3"
-          >
-            <Plus size={14} className="text-emerald-800" /> Aggiungi Landmark
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <>
-    <div className="flex h-full w-full overflow-hidden bg-transparent lg:p-6 lg:pt-0 gap-10 relative">
-      
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-80 py-8 gap-12 shrink-0">
-        <FilterContent />
-      </aside>
-
-      {/* Mobile Floating Filter Button */}
-      {!selectedPianta && (
-        <button 
-          onClick={() => setIsFilterMobileOpen(true)}
-          className="lg:hidden fixed bottom-6 left-6 z-40 w-14 h-14 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-2xl active:scale-95 transition-transform"
-        >
-          <Filter size={24} />
-        </button>
-      )}
-
-      {/* Mobile Filter Drawer */}
-      <AnimatePresence>
-        {isFilterMobileOpen && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsFilterMobileOpen(false)}
-              className="lg:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70]"
-            />
-            <motion.div 
-              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#fcfaf7] rounded-t-[3rem] p-8 z-[80] shadow-2xl"
-            >
-              <FilterContent />
-            </motion.div>
-          </>
+        {!selectedPianta && !selectedPOI && (
+          <FilterSidebar 
+            filtri={filtri}
+            setFiltri={setFiltri}
+            colorMode={colorMode}
+            setColorMode={setColorMode}
+            filari={filari}
+            tipi={tipi}
+            onOpenPOIModal={() => setIsPOIModalOpen(true)}
+            isMobileOpen={isFilterMobileOpen}
+            setIsMobileOpen={setIsFilterMobileOpen}
+          />
         )}
-      </AnimatePresence>
 
       {/* Main Map */}
       <main className="flex-1 relative lg:rounded-[2.5rem] overflow-hidden">

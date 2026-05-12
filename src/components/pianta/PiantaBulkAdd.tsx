@@ -5,6 +5,7 @@ import { useFilari } from '@/hooks/useFilari';
 import { useTipiPianta } from '@/hooks/useTipiPianta';
 import { Sprout, Sparkles, AlertCircle } from 'lucide-react';
 import type { PiantaInput } from '@/types';
+import { ANNO_CORRENTE } from '@/constants/registry';
 
 export function PiantaBulkAdd({ onClose }: { onClose?: () => void }) {
   const qc = useQueryClient();
@@ -20,7 +21,7 @@ export function PiantaBulkAdd({ onClose }: { onClose?: () => void }) {
     tipo_id: '',
     startPos: 1,
     quantita: 50,
-    anno_impianto: new Date().getFullYear(),
+    anno_impianto: ANNO_CORRENTE,
     venditore: '',
   });
 
