@@ -35,7 +35,7 @@ export function StatCard({ label, value, color = 'default', icon }: StatCardProp
       </div>
 
       <div className="relative z-10 flex items-baseline gap-1 pt-2">
-        <span className={`text-2xl sm:text-5xl font-heading font-black tracking-tighter truncate ${c.text}`}>
+        <span className={`text-2xl sm:text-5xl font-heading font-black tracking-tighter truncate pr-2 ${c.text}`}>
           {value}
         </span>
         <span className="text-[9px] sm:text-xs font-bold text-slate-300 uppercase tracking-widest hidden sm:inline">

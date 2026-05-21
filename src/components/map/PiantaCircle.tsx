@@ -42,7 +42,6 @@ function PiantaCircle({
       <circle
         r={24}
         fill="transparent"
-        className="pointer-events-auto"
       />
 
       {/* Feedback Selezione */}
@@ -63,7 +62,7 @@ function PiantaCircle({
         stroke={isSelected ? '#ffffff' : (isMorta ? '#ef4444' : '#042f2e')}
         strokeWidth={isSelected ? 2 : (isMorta ? 2 : 1)}
         strokeDasharray={isMorta ? "2,2" : "0"}
-        className="transition-all duration-200 group-hover:opacity-80"
+        className="transition-all duration-300 ease-out group-hover:brightness-110 group-hover:drop-shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
       />
 
       {/* Simbolo morte (X rossa minimale) */}

@@ -4,14 +4,14 @@ import { useTipiPianta } from '@/hooks/useTipiPianta';
 import { useOperazioni } from '@/hooks/useOperazioni';
 import { usePOI } from '@/hooks/usePOI';
 import { useState, useMemo } from 'react';
-import { BarChart3, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
+import { BarChart3, Settings2 } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { TipoBar } from '@/components/dashboard/TipoBar';
 import TipiManager from '@/components/dashboard/TipiManager';
 import FilariManager from '@/components/dashboard/FilariManager';
 import POIManager from '@/components/dashboard/POIManager';
 import VenditoreBulkTool from '@/components/dashboard/VenditoreBulkTool';
-import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import { AccordionSection } from '@/components/ui/Accordion';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'stats' | 'manage'>('stats');
@@ -49,33 +49,8 @@ export default function DashboardPage() {
 
   const tipiConPiante = tipi.filter(t => countByTipo[t.id]);
 
-  const AccordionSection = ({ id, title, count, children }: { id: string, title: string, count: number, children: React.ReactNode }) => {
-    const isOpen = openAccordion === id;
-    return (
-      <div className="premium-card bg-white border border-slate-100 overflow-hidden transition-all duration-500 shadow-sm hover:shadow-md">
-        <button
-          onClick={() => setOpenAccordion(isOpen ? null : id)}
-          className="w-full px-4 sm:px-8 py-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors text-left"
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <h3 className="text-base sm:text-xl font-heading font-black text-slate-900 uppercase tracking-tight italic truncate">
-              {title}
-            </h3>
-            <span className="px-2.5 py-0.5 bg-slate-100 rounded-full text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">
-              {count}
-            </span>
-          </div>
-          {isOpen ? <ChevronUp className="text-slate-300 shrink-0 ml-2" /> : <ChevronDown className="text-slate-300 shrink-0 ml-2" />}
-        </button>
-        {isOpen && (
-          <div className="px-4 sm:px-8 pb-8 pt-4 animate-in fade-in slide-in-from-top-4 duration-500 border-t border-slate-50 overflow-hidden">
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
-          </div>
-        )}
-      </div>
-    );
+  const toggleAccordion = (id: string) => {
+    setOpenAccordion(prev => (prev === id ? null : id));
   };
 
   return (
@@ -125,7 +100,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">
               <div className="lg:col-span-2 premium-card p-5 sm:p-10 bg-white overflow-hidden">
                 <div className="flex items-center justify-between mb-6 lg:mb-12">
-                  <h2 className="text-lg sm:text-2xl font-heading font-black text-slate-900 truncate">Varietà d'Uva</h2>
+                  <h2 className="text-lg sm:text-2xl font-heading font-black text-slate-900 truncate pr-2">Varietà d'Uva</h2>
                   <div className="h-px flex-1 mx-4 bg-slate-100 hidden sm:block" />
                   <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">Distribuzione</span>
                 </div>
@@ -164,19 +139,19 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-6 animate-in fade-in duration-500">
-            <AccordionSection id="filari" title="Struttura Filari" count={filari.length}>
+            <AccordionSection id="filari" title="Struttura Filari" count={filari.length} isOpen={openAccordion === 'filari'} onToggle={toggleAccordion}>
               <FilariManager />
             </AccordionSection>
 
-            <AccordionSection id="tipi" title="Varietà d'Uva" count={tipi.length}>
+            <AccordionSection id="tipi" title="Varietà d'Uva" count={tipi.length} isOpen={openAccordion === 'tipi'} onToggle={toggleAccordion}>
               <TipiManager />
             </AccordionSection>
 
-            <AccordionSection id="poi" title="Punti di Interesse" count={poi.length}>
+            <AccordionSection id="poi" title="Punti di Interesse" count={poi.length} isOpen={openAccordion === 'poi'} onToggle={toggleAccordion}>
               <POIManager />
             </AccordionSection>
 
-            <AccordionSection id="bulk" title="Assegnazione Lotti" count={1}>
+            <AccordionSection id="bulk" title="Assegnazione Lotti" count={1} isOpen={openAccordion === 'bulk'} onToggle={toggleAccordion}>
               <VenditoreBulkTool />
             </AccordionSection>
           </div>

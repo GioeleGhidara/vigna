@@ -16,6 +16,7 @@ interface Props {
   onDelete: () => void;
   onEdit: () => void;
   onClose: () => void;
+  coords?: { x: number, y: number };
 }
 
 export default function PiantaCard({
@@ -28,18 +29,19 @@ export default function PiantaCard({
   onCancelReposition,
   onDelete,
   onEdit,
-  onClose
+  onClose,
+  coords
 }: Props) {
 
   // Mappatura visiva degli stati centralizzata
   const currentStatus = STATI_PIANTA.find(s => s.id === pianta.stato);
-  
+
   const statusConfig = {
     attiva: { icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     morta: { icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
     ripiantata: { icon: PlusCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
   };
- 
+
   const style = statusConfig[pianta.stato as keyof typeof statusConfig] || { icon: HelpCircle, color: 'text-slate-400', bg: 'bg-slate-50' };
   const label = currentStatus?.label || 'Stato Ignoto';
 
@@ -56,8 +58,8 @@ export default function PiantaCard({
           <h2 className="text-4xl font-heading font-black text-slate-900 tracking-tighter italic">
             {pianta.codice_etichetta || `Vite P${pianta.posizione_nel_filare}`}
           </h2>
-          <p className="text-sm font-medium text-slate-400">
-            {tipo?.nome || 'Varietà non specificata'} • {filareNome || 'Filare Ignoto'}
+          <p className="text-sm font-medium text-slate-500">
+            {tipo?.nome || 'Varietà non specificata'} <span className="text-emerald-800 font-bold">•</span> {filareNome || 'Filare Ignoto'}
           </p>
         </div>
         <button
@@ -107,18 +109,18 @@ export default function PiantaCard({
       <div className="space-y-3 pt-4">
         <button
           onClick={isRepositioning ? onCancelReposition : onStartReposition}
-          className={`w-full py-5 rounded-[2rem] flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm ${isRepositioning
-              ? 'bg-amber-100 text-amber-700 border border-amber-200'
-              : 'bg-white border border-slate-100 text-slate-900 hover:shadow-md'
+          className={`w-full py-5 rounded-[2rem] flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all ${isRepositioning
+            ? 'bg-amber-100 text-amber-700 border border-amber-200'
+            : 'glass-button text-slate-900 hover:scale-[1.02] active:scale-[0.98]'
             }`}
         >
           <Move size={16} />
-          {isRepositioning ? 'Annulla Spostamento' : 'Sposta in Mappa'}
+          {isRepositioning ? 'Annulla Spostamento' : 'Sposta'}
         </button>
 
         <button
           onClick={onEdit}
-          className="w-full py-5 rounded-[2rem] flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-emerald-900 transition-all shadow-lg"
+          className="w-full py-5 rounded-[2rem] flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-emerald-900 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
         >
           <Edit2 size={16} />
           Modifica Dati
@@ -126,19 +128,28 @@ export default function PiantaCard({
 
         <button
           onClick={onDelete}
-          className="w-full py-5 rounded-[2rem] flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 transition-all"
+          className="w-full py-5 rounded-[2rem] flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 hover:scale-[1.02] active:scale-[0.98]"
         >
           <Trash2 size={16} />
           Elimina Vite
         </button>
       </div>
 
-      {/* FOOTER: Dati di Sistema (UUID) */}
-      <footer className="pt-6 border-t border-slate-50 flex items-center gap-3 text-slate-300">
-        <MapPin size={12} />
-        <span className="text-[9px] font-mono font-medium tracking-tight">
-          SISTEMA ID: {pianta.id}
-        </span>
+      {/* FOOTER: Dati di Sistema (UUID) e Coordinate */}
+      <footer className="pt-6 border-t border-slate-50 flex items-center justify-between text-slate-300">
+        <div className="flex items-center gap-2">
+          <MapPin size={12} />
+          <span className="text-[9px] font-mono font-medium tracking-tight">
+            ID: {pianta.id.substring(0,8)}...
+          </span>
+        </div>
+        {coords && (
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-mono font-black tracking-widest bg-slate-100 text-slate-400 px-2 py-1 rounded-md">
+              X: {Math.round(coords.x)} | Y: {Math.round(coords.y)}
+            </span>
+          </div>
+        )}
       </footer>
     </div>
   );

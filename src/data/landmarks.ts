@@ -1,4 +1,4 @@
-import { CloudSun, Droplets, MapPin, Warehouse, Zap } from 'lucide-react';
+import { CloudSun, Droplets, MapPin, Trees, Warehouse, Zap } from 'lucide-react';
 
 export const LANDMARK_TYPES = [
   { id: 'sensor', label: 'Sensore IoT', icon: Zap, color: 'blue' },

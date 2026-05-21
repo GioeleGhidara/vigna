@@ -11,10 +11,11 @@
   --font-heading: "Montserrat", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   
-  --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.1);
-  --color-reserve-burgundy: #4c0519;
+  --shadow-premium: 0 20px 50px -10px rgba(0, 0, 0, 0.08), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  --color-reserve-burgundy: #600822;
   --color-reserve-gold: #fbbf24;
-  --color-reserve-emerald: #064e3b;
+  --color-reserve-emerald: #065f46;
 }
 
 @theme inline {
@@ -127,12 +128,20 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    opacity: 0.03;
+    opacity: 0.02;
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
   .premium-card {
     @apply bg-white border border-slate-100 shadow-premium rounded-[2rem] overflow-hidden;
+  }
+
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-2xl border border-white/50 shadow-glass rounded-[2rem];
+  }
+
+  .glass-button {
+    @apply bg-white/50 backdrop-blur-md border border-white/40 hover:bg-white/80 hover:shadow-md transition-all duration-300;
   }
 }

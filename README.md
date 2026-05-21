@@ -30,10 +30,12 @@ Ogni vite ha una doppia anima:
 1.  **UUID Tecnico**: Garantisce l'integrità dei dati a livello di database (Supabase).
 2.  **Codice Etichetta (F1-001)**: Il riferimento human-readable che corrisponde ai cartellini fisici in campo.
 
-### 🧱 Modellazione Infrastrutturale
+### 🧱 Modellazione Infrastrutturale e Mappa Interattiva
 - **Filari Dinamici**: Calcolo matematico delle posizioni e gestione dei venditori/vivai.
-- **Punti di Interesse (POI)**: Iconografia professionale per alberi da frutto, pozzi, cascine e infrastrutture.
-- **Impianto Massivo**: Generazione transazionale di centinaia di viti in un singolo click.
+- **Punti di Interesse (POI) Intelligenti**: Oltre 20 icone custom (es. Melograno, Ulivo, Baracca) con categorizzazione e dimensionamento automatico sulla mappa.
+- **Riposizionamento Visuale (Drag & Drop)**: Modalità speciale per muovere piante e strutture cliccando direttamente in mappa.
+- **Memoria Storica (Undo System)**: Cronologia degli spostamenti durante il riposizionamento per tornare ai passi precedenti.
+- **Allineamento di Precisione**: Gestione avanzata delle coordinate X/Y esatte per allineamenti geometrici perfetti tra alberi e filari.
 
 ---
 

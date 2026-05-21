@@ -3,97 +3,113 @@ import { TransformWrapper, TransformComponent, useTransformContext } from 'react
 import { calcCoords, calcCanvasSize } from '@/lib/mapUtils';
 import PiantaCircle from './PiantaCircle';
 import {
-  Home, Building2, Droplets, Gauge, Trees, Apple, Cherry, Zap, Sprout, Citrus, Flower
-} from 'lucide-react';
+  ContatoreIcon, RubinettoIcon, MeloIcon, PeroIcon, UlivoIcon, MelogranoIcon,
+  FicoIcon, ScalaIcon, CaminoIcon, ReteIcon, BaraccaIcon, CacoIcon,
+  CiliegioIcon, FragolaIcon, AsparagoIcon, AmarenoIcon, PescoIcon,
+  PrugnoIcon, AlbicoccoIcon, NespoloIcon, CancelloIcon, KiwiIcon,
+  LimoneIcon, BananaIcon, UnknownIcon
+} from '@/components/icons/POIIcons';
 import type { Pianta, Filare, TipoPianta, POI } from '@/types';
 import { MAP_CONFIG } from '@/constants/mappa';
 
-// Mappatura coerente al 100% con POIManager.tsx usando esclusivamente lucide-react
 const ICON_MAP: Record<string, { icon: any, color: string }> = {
-  Home: { icon: Home, color: '#0f172a' },
-  Warehouse: { icon: Building2, color: '#064e3b' },
-  Droplets: { icon: Droplets, color: '#2563eb' },
-  Gauge: { icon: Gauge, color: '#3b82f6' },
-  UtilityPole: { icon: Zap, color: '#ca8a04' },
-  Droplet: { icon: Droplets, color: '#2563eb' },
-  Sprout: { icon: Sprout, color: '#10b981' },
-  Albero: { icon: Trees, color: '#059669' },
-  Melo: { icon: Apple, color: '#ef4444' },
-  Pero: { icon: Apple, color: '#f59e0b' },
-  Limone: { icon: Citrus, color: '#eab308' },
-  Ciliegio: { icon: Cherry, color: '#dc2626' },
-  Banana: { icon: Trees, color: '#f59e0b' },
-  Vite: { icon: Sprout, color: '#10b981' },
-  Pesco: { icon: Flower, color: '#db2777' },
+  // Nuovi ID (dal form)
+  Contatore: { icon: ContatoreIcon, color: '#3b82f6' },
+  Rubinetto: { icon: RubinettoIcon, color: '#2563eb' },
+  Baracca: { icon: BaraccaIcon, color: '#0f172a' },
+  Scala: { icon: ScalaIcon, color: '#78350f' },
+  Camino: { icon: CaminoIcon, color: '#475569' },
+  Rete: { icon: ReteIcon, color: '#64748b' },
+  Cancello: { icon: CancelloIcon, color: '#1e293b' },
+  
+  Melo: { icon: MeloIcon, color: '#ef4444' },
+  Pero: { icon: PeroIcon, color: '#f59e0b' },
+  Ciliegio: { icon: CiliegioIcon, color: '#dc2626' },
+  Pesco: { icon: PescoIcon, color: '#db2777' },
+  Prugno: { icon: PrugnoIcon, color: '#7e22ce' },
+  Albicocco: { icon: AlbicoccoIcon, color: '#f97316' },
+  
+  Ulivo: { icon: UlivoIcon, color: '#059669' },
+  Fico: { icon: FicoIcon, color: '#4c1d95' },
+  Caco: { icon: CacoIcon, color: '#ea580c' },
+  Melograno: { icon: MelogranoIcon, color: '#be123c' },
+  Nespolo: { icon: NespoloIcon, color: '#d97706' },
+  Fragola: { icon: FragolaIcon, color: '#e11d48' },
+  Asparago: { icon: AsparagoIcon, color: '#166534' },
+  Amareno: { icon: AmarenoIcon, color: '#9f1239' },
+  Kiwi: { icon: KiwiIcon, color: '#65a30d' },
+  Limone: { icon: LimoneIcon, color: '#eab308' },
+  Banana: { icon: BananaIcon, color: '#facc15' }
 };
 
 // Sotto-componente isolato: ascolta lo zoom SOLO per i POI/Alberi (~30 elementi totali)
 // Rimosso 'selectedId' destrutturato per eliminare l'errore di variabile dichiarata ma non utilizzata
 function DynamicPOILayers({
-  poi, onSelect
+  poi, onSelect, repositioningId, previewCoords, selectedId
 }: {
-  poi: POI[]; selectedId?: string; onSelect: (id: string) => void;
+  poi: POI[]; onSelect: (id: string) => void; repositioningId?: string | null; previewCoords?: {x: number, y: number} | null; selectedId?: string;
 }) {
   const { state } = useTransformContext();
   const scale = state.scale;
 
   const isBirdseyeView = scale < 0.2;
-  const isDetailView = scale > 0.7;
 
   return (
     <g id="poi-layers">
       {poi.map(item => {
-        const config = ICON_MAP[item.icona] || { icon: Trees, color: '#059669' };
-        const isEdificio = item.tipo === 'edificio';
-        const isAlbero = item.tipo === 'albero';
+        const isRepositioning = repositioningId === item.id;
+        const currentX = (isRepositioning && previewCoords) ? previewCoords.x : item.coord_x;
+        const currentY = (isRepositioning && previewCoords) ? previewCoords.y : item.coord_y;
+        
+        const config = ICON_MAP[item.icona] || { icon: UnknownIcon, color: '#ef4444' };
+        const isEdificio = item.tipo === 'edificio' || ['Baracca', 'Camino', 'Cancello', 'Rete'].includes(item.icona);
 
-        const baseSize = isEdificio ? 40 : (isAlbero ? 30 : 24);
-        const currentSize = Math.min(80, baseSize / scale);
+        const baseSize = isEdificio ? 48 : 38;
+        const currentSize = Math.min(90, baseSize / scale);
+        const isSelected = selectedId === item.id;
 
         return (
           <g
             key={item.id}
-            transform={`translate(${item.coord_x}, ${item.coord_y})`}
-            className="opacity-90 hover:opacity-100 transition-opacity cursor-pointer"
+            transform={`translate(${currentX}, ${currentY})`}
+            className="cursor-pointer group"
             onClick={(e) => {
               e.stopPropagation();
               onSelect(item.id);
             }}
           >
+            <circle r={Math.max(32, currentSize)} fill="transparent" />
+
+            {!isBirdseyeView && isEdificio && isSelected && (
+              <rect
+                x={-currentSize * 0.75}
+                y={-currentSize * 0.75}
+                width={currentSize * 1.5}
+                height={currentSize * 1.5}
+                fill="none"
+                stroke="#fbbf24"
+                strokeWidth={2}
+                className="animate-pulse"
+                rx={8}
+              />
+            )}
+
+            {!isBirdseyeView && !isEdificio && isSelected && (
+              <circle
+                r={currentSize * 0.7}
+                fill="none"
+                stroke="#fbbf24"
+                strokeWidth={2}
+                className="animate-pulse"
+              />
+            )}
+
             {isBirdseyeView ? (
-              <circle r={8 / scale} fill={config.color} />
+              <circle r={10 / scale} fill={config.color} />
             ) : (
-              <>
-                {isEdificio && (
-                  <rect
-                    x={-currentSize * 0.25}
-                    y={-currentSize * 0.25}
-                    width={currentSize * 1.5}
-                    height={currentSize * 1.5}
-                    rx={8 / scale}
-                    fill="#fcfaf7"
-                    stroke="#e2e8f0"
-                    strokeWidth={1 / scale}
-                    className="shadow-md"
-                  />
-                )}
-
-                <g transform={`translate(${-currentSize / 2}, ${-currentSize / 2})`}>
-                  <config.icon size={currentSize} color={config.color} strokeWidth={2} />
-                </g>
-
-                {isDetailView && (
-                  <text
-                    x={isEdificio ? currentSize * 1.2 : 0}
-                    y={isEdificio ? currentSize * 0.5 : currentSize * 0.7 + 10}
-                    textAnchor={isEdificio ? 'start' : 'middle'}
-                    style={{ fontSize: `${Math.min(20, 11 / scale)}px` }}
-                    className="font-bold fill-slate-800 pointer-events-none select-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] uppercase tracking-tighter"
-                  >
-                    {item.nome}
-                  </text>
-                )}
-              </>
+              <g transform={`translate(${-currentSize / 2}, ${-currentSize / 2})`}>
+                <config.icon size={currentSize} color={config.color} strokeWidth={2} />
+              </g>
             )}
           </g>
         );
@@ -111,10 +127,11 @@ interface Props {
   onSelect: (id: string) => void;
   repositioningId?: string | null;
   onReposition?: (id: string, x: number, y: number) => void;
+  previewCoords?: {x: number, y: number} | null;
   colorMode?: 'variety' | 'health';
 }
 
-export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, onSelect, repositioningId, onReposition, colorMode = 'variety' }: Props) {
+export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, onSelect, repositioningId, onReposition, previewCoords, colorMode = 'variety' }: Props) {
   const { width: vWidth, height: vHeight } = calcCanvasSize(filari, poi);
   const width = vWidth + 200;
   const height = vHeight + 200;
@@ -140,19 +157,19 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
         initialScale={1.2}
         centerOnInit
         panning={{
-          disabled: !!repositioningId,
-          velocityDisabled: false
+          disabled: false,
+          velocityDisabled: false,
+          lockAxisX: false,
+          lockAxisY: false,
         }}
-        // RICALIBRAZIONE ROTELLINA / TOUCHPAD:
-        // Riduciamo drasticamente l'incremento (step) e disattiviamo l'attivazione a scatti (smoothStep)
         wheel={{
-          step: 0.015,     // Valore ultra-ridotto per forzare passaggi millimetrici
-          smoothStep: 0.005 // Smorza la curva di accelerazione del tocco
+          step: 0.08,
+          smoothStep: 0.002,
         } as any}
-        // Disattiviamo l'animazione di transizione fissa per la rotellina, 
-        // lasciando che lo zoom segua esattamente il movimento fisico delle tue dita
         zoomAnimation={{
-          disabled: true
+          disabled: false,
+          animationTime: 400,
+          animationType: "easeOut"
         }}
         doubleClick={{ disabled: true }}
         onTransform={(ref) => {
@@ -210,7 +227,7 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
             </g>
 
             {/* STRUTTURA: Filari Lineari Geometrici */}
-            <g id="vigneto-struttura">
+            <g id="vigneto-struttura" style={{ pointerEvents: repositioningId ? 'none' : 'auto' }}>
               <text x={MAP_CONFIG.MARGIN_LEFT - 50} y={MAP_CONFIG.MARGIN_TOP - 60} className="font-heading font-black text-8xl text-slate-900 uppercase tracking-tighter opacity-[0.03] pointer-events-none select-none">
                 Fojachini
               </text>
@@ -234,14 +251,16 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
             </g>
 
             {/* LIVELLO 3: Il Vigneto */}
-            <g id="vigneto-viti">
+            <g id="vigneto-viti" style={{ pointerEvents: repositioningId ? 'none' : 'auto' }}>
               {piante.map(p => {
                 const filare = filariMap[p.filare_id];
                 if (!filare) return null;
                 const isCustom = p.coord_x != null && p.coord_y != null;
                 const coords = calcCoords(filare, p.posizione_nel_filare);
-                const x = isCustom ? p.coord_x! : coords.x;
-                const y = isCustom ? p.coord_y! : coords.y;
+                
+                const isRepositioning = repositioningId === p.id;
+                const x = (isRepositioning && previewCoords) ? previewCoords.x : (isCustom ? p.coord_x! : coords.x);
+                const y = (isRepositioning && previewCoords) ? previewCoords.y : (isCustom ? p.coord_y! : coords.y);
 
                 return (
                   <PiantaCircle
@@ -259,11 +278,15 @@ export default function MapCanvas({ filari, piante, tipiMap, poi, selectedId, on
             </g>
 
             {/* LIVELLI 4 e 5: Alberi e POI */}
-            <DynamicPOILayers
-              poi={poi}
-              selectedId={selectedId}
-              onSelect={onSelect}
-            />
+            <g style={{ pointerEvents: repositioningId ? 'none' : 'auto' }}>
+              <DynamicPOILayers
+                poi={poi}
+                onSelect={onSelect}
+                repositioningId={repositioningId}
+                previewCoords={previewCoords}
+                selectedId={selectedId}
+              />
+            </g>
 
           </svg>
         </TransformComponent>

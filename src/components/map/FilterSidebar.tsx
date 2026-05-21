@@ -99,7 +99,7 @@ export default function FilterSidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-80 py-8 gap-12 shrink-0">
+      <aside className="hidden lg:flex flex-col w-80 py-8 px-6 gap-12 shrink-0 glass-panel h-fit mt-6">
         <FilterContent />
       </aside>
 
@@ -122,8 +122,8 @@ export default function FilterSidebar({
             />
             <motion.div 
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#fcfaf7] rounded-t-[3rem] p-8 z-[80] shadow-2xl"
+              transition={{ type: "spring", damping: 20, stiffness: 180 }}
+              className="lg:hidden fixed bottom-0 left-0 right-0 glass-panel rounded-t-[3rem] p-8 z-[80] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-b-0"
             >
               <FilterContent />
             </motion.div>
